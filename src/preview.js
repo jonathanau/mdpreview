@@ -5,6 +5,11 @@ import DOMPurify from 'dompurify';
 
 import githubCssUrl from 'highlight.js/styles/github.css?url';
 import githubDarkCssUrl from 'highlight.js/styles/github-dark.css?url';
+import solarizedLightCssUrl from 'highlight.js/styles/base16/solarized-light.css?url';
+import solarizedDarkCssUrl from 'highlight.js/styles/base16/solarized-dark.css?url';
+import monokaiCssUrl from 'highlight.js/styles/monokai.css?url';
+import nordCssUrl from 'highlight.js/styles/nord.css?url';
+import draculaCssUrl from 'highlight.js/styles/base16/dracula.css?url';
 
 // ─── Configure marked ──────────────────────────────────────────────────────
 
@@ -24,13 +29,24 @@ marked.setOptions({ gfm: true, breaks: true });
 
 let hljsLink = null;
 
-export function setHljsTheme(isDark) {
+const hljsThemes = {
+  'folio': githubCssUrl,
+  'ember': githubDarkCssUrl,
+  'solarized-light': solarizedLightCssUrl,
+  'solarized-dark': solarizedDarkCssUrl,
+  'monokai': monokaiCssUrl,
+  'nord': nordCssUrl,
+  'dracula': draculaCssUrl,
+  'github-light': githubCssUrl
+};
+
+export function setHljsTheme(themeName) {
   if (!hljsLink) {
     hljsLink = document.createElement('link');
     hljsLink.rel = 'stylesheet';
     document.head.appendChild(hljsLink);
   }
-  hljsLink.href = isDark ? githubDarkCssUrl : githubCssUrl;
+  hljsLink.href = hljsThemes[themeName] || githubCssUrl;
 }
 
 // ─── Render ────────────────────────────────────────────────────────────────

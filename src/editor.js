@@ -21,86 +21,49 @@ const baseTheme = EditorView.baseTheme({
   '.cm-gutter': { minWidth: '36px' },
 });
 
-export const lightEditorTheme = EditorView.theme({
-  '&': { backgroundColor: '#ffffff', color: '#1a1714' },
-  '.cm-content': { caretColor: '#c05a2b' },
-  '.cm-cursor, .cm-dropCursor': { borderLeftColor: '#c05a2b', borderLeftWidth: '2px' },
+const baseEditorTheme = {
+  '&': { backgroundColor: 'var(--surface)', color: 'var(--text)' },
+  '.cm-content': { caretColor: 'var(--accent)' },
+  '.cm-cursor, .cm-dropCursor': { borderLeftColor: 'var(--accent)', borderLeftWidth: '2px' },
   '&.cm-focused .cm-selectionBackground, .cm-selectionBackground': {
-    backgroundColor: '#f5e8df',
+    backgroundColor: 'var(--accent-soft)',
   },
-  '.cm-activeLine': { backgroundColor: '#faf8f4' },
-  '.cm-gutters': { backgroundColor: '#f0ede6', color: '#b0ab9f' },
-  '.cm-activeLineGutter': { backgroundColor: '#e8e4dc', color: '#6b6560' },
-  '.cm-foldPlaceholder': { backgroundColor: '#e0dbd0', border: 'none', color: '#6b6560' },
-}, { dark: false });
+  '.cm-activeLine': { backgroundColor: 'var(--surface-2)' },
+  '.cm-gutters': { backgroundColor: 'var(--surface-2)', color: 'var(--text-3)' },
+  '.cm-activeLineGutter': { backgroundColor: 'var(--border)', color: 'var(--text-2)' },
+  '.cm-foldPlaceholder': { backgroundColor: 'var(--border)', border: 'none', color: 'var(--text-2)' },
+};
 
-export const darkEditorTheme = EditorView.theme({
-  '&': { backgroundColor: '#211e24', color: '#ede9f0' },
-  '.cm-content': { caretColor: '#e07a4f' },
-  '.cm-cursor, .cm-dropCursor': { borderLeftColor: '#e07a4f', borderLeftWidth: '2px' },
-  '&.cm-focused .cm-selectionBackground, .cm-selectionBackground': {
-    backgroundColor: '#3a2518',
-  },
-  '.cm-activeLine': { backgroundColor: '#252228' },
-  '.cm-gutters': { backgroundColor: '#1c1a1f', color: '#4a4555' },
-  '.cm-activeLineGutter': { backgroundColor: '#252228', color: '#9e99a8' },
-  '.cm-foldPlaceholder': { backgroundColor: '#332f3a', border: 'none', color: '#9e99a8' },
-}, { dark: true });
+export const lightEditorTheme = EditorView.theme(baseEditorTheme, { dark: false });
+export const darkEditorTheme = EditorView.theme(baseEditorTheme, { dark: true });
 
 // ─── Syntax Highlighting ───────────────────────────────────────────────────
 
-export const lightHighlight = HighlightStyle.define([
-  { tag: t.heading1, color: '#1a1714', fontWeight: '500', fontSize: '1.25em' },
-  { tag: t.heading2, color: '#1a1714', fontWeight: '500', fontSize: '1.1em' },
-  { tag: t.heading3, color: '#1a1714', fontWeight: '500' },
-  { tag: [t.heading4, t.heading5, t.heading6], color: '#3a3530', fontWeight: '500' },
-  { tag: t.emphasis, fontStyle: 'italic', color: '#3a3530' },
-  { tag: t.strong, fontWeight: '500', color: '#1a1714' },
-  { tag: t.strikethrough, textDecoration: 'line-through', color: '#9c978e' },
-  { tag: t.link, color: '#c05a2b', textDecoration: 'underline', textUnderlineOffset: '3px' },
-  { tag: t.url, color: '#9c978e' },
-  { tag: t.quote, color: '#6b6560', fontStyle: 'italic' },
-  { tag: t.monospace, color: '#c05a2b', fontFamily: "'JetBrains Mono', monospace" },
-  { tag: t.comment, color: '#9c978e', fontStyle: 'italic' },
-  { tag: [t.keyword, t.operator], color: '#b04030' },
-  { tag: [t.string, t.special(t.brace)], color: '#3c7a3c' },
-  { tag: t.number, color: '#1565c0' },
-  { tag: t.bool, color: '#b04030' },
-  { tag: t.variableName, color: '#1a1714' },
-  { tag: t.function(t.variableName), color: '#5a3a9a' },
-  { tag: t.definition(t.variableName), color: '#5a3a9a' },
-  { tag: t.typeName, color: '#1565c0' },
-  { tag: t.punctuation, color: '#9c978e' },
-  { tag: t.processingInstruction, color: '#9c978e' },
-  { tag: t.meta, color: '#9c978e' },
-  { tag: t.atom, color: '#b04030' },
-]);
-
-export const darkHighlight = HighlightStyle.define([
-  { tag: t.heading1, color: '#ede9f0', fontWeight: '500', fontSize: '1.25em' },
-  { tag: t.heading2, color: '#dbd7e0', fontWeight: '500', fontSize: '1.1em' },
-  { tag: t.heading3, color: '#dbd7e0', fontWeight: '500' },
-  { tag: [t.heading4, t.heading5, t.heading6], color: '#c8c4cc', fontWeight: '500' },
-  { tag: t.emphasis, fontStyle: 'italic', color: '#c8c4cc' },
-  { tag: t.strong, fontWeight: '500', color: '#ede9f0' },
-  { tag: t.strikethrough, textDecoration: 'line-through', color: '#6e6a78' },
-  { tag: t.link, color: '#e07a4f', textDecoration: 'underline', textUnderlineOffset: '3px' },
-  { tag: t.url, color: '#6e6a78' },
-  { tag: t.quote, color: '#9e99a8', fontStyle: 'italic' },
-  { tag: t.monospace, color: '#e07a4f', fontFamily: "'JetBrains Mono', monospace" },
-  { tag: t.comment, color: '#6e6a78', fontStyle: 'italic' },
-  { tag: [t.keyword, t.operator], color: '#e06c75' },
-  { tag: [t.string, t.special(t.brace)], color: '#98c379' },
-  { tag: t.number, color: '#61afef' },
-  { tag: t.bool, color: '#e06c75' },
-  { tag: t.variableName, color: '#ede9f0' },
-  { tag: t.function(t.variableName), color: '#c678dd' },
-  { tag: t.definition(t.variableName), color: '#c678dd' },
-  { tag: t.typeName, color: '#61afef' },
-  { tag: t.punctuation, color: '#6e6a78' },
-  { tag: t.processingInstruction, color: '#6e6a78' },
-  { tag: t.meta, color: '#6e6a78' },
-  { tag: t.atom, color: '#e06c75' },
+export const dynamicHighlight = HighlightStyle.define([
+  { tag: t.heading1, color: 'var(--text)', fontWeight: '500', fontSize: '1.25em' },
+  { tag: t.heading2, color: 'var(--text)', fontWeight: '500', fontSize: '1.1em' },
+  { tag: t.heading3, color: 'var(--text)', fontWeight: '500' },
+  { tag: [t.heading4, t.heading5, t.heading6], color: 'var(--text-2)', fontWeight: '500' },
+  { tag: t.emphasis, fontStyle: 'italic', color: 'var(--text-2)' },
+  { tag: t.strong, fontWeight: '500', color: 'var(--text)' },
+  { tag: t.strikethrough, textDecoration: 'line-through', color: 'var(--text-3)' },
+  { tag: t.link, color: 'var(--accent)', textDecoration: 'underline', textUnderlineOffset: '3px' },
+  { tag: t.url, color: 'var(--text-3)' },
+  { tag: t.quote, color: 'var(--text-2)', fontStyle: 'italic' },
+  { tag: t.monospace, color: 'var(--accent)', fontFamily: "'JetBrains Mono', monospace" },
+  { tag: t.comment, color: 'var(--text-3)', fontStyle: 'italic' },
+  { tag: [t.keyword, t.operator], color: 'var(--syntax-keyword)' },
+  { tag: [t.string, t.special(t.brace)], color: 'var(--syntax-string)' },
+  { tag: t.number, color: 'var(--syntax-number)' },
+  { tag: t.bool, color: 'var(--syntax-keyword)' },
+  { tag: t.variableName, color: 'var(--text)' },
+  { tag: t.function(t.variableName), color: 'var(--syntax-function)' },
+  { tag: t.definition(t.variableName), color: 'var(--syntax-function)' },
+  { tag: t.typeName, color: 'var(--syntax-number)' },
+  { tag: t.punctuation, color: 'var(--text-3)' },
+  { tag: t.processingInstruction, color: 'var(--text-3)' },
+  { tag: t.meta, color: 'var(--text-3)' },
+  { tag: t.atom, color: 'var(--syntax-keyword)' },
 ]);
 
 // ─── Compartments for runtime reconfiguration ──────────────────────────────
@@ -125,9 +88,7 @@ export function createEditor({ container, doc = '', onChange, isDark = false }) 
         markdown({ base: markdownLanguage }),
         baseTheme,
         themeCompartment.of(isDark ? darkEditorTheme : lightEditorTheme),
-        highlightCompartment.of(
-          syntaxHighlighting(isDark ? darkHighlight : lightHighlight)
-        ),
+        highlightCompartment.of(syntaxHighlighting(dynamicHighlight)),
         EditorView.updateListener.of((update) => {
           if (update.docChanged) {
             onChange(update.state.doc.toString());
@@ -146,9 +107,7 @@ export function setEditorTheme(view, isDark) {
   view.dispatch({
     effects: [
       themeCompartment.reconfigure(isDark ? darkEditorTheme : lightEditorTheme),
-      highlightCompartment.reconfigure(
-        syntaxHighlighting(isDark ? darkHighlight : lightHighlight)
-      ),
+      highlightCompartment.reconfigure(syntaxHighlighting(dynamicHighlight)),
     ],
   });
 }

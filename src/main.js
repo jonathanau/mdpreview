@@ -16,7 +16,7 @@ const storage = new Storage();
 let editorView = null;
 let currentDoc = null;
 let saveTimer = null;
-let isDark = false;
+let currentTheme = 'solarized-light';
 let sidebarOpen = true;
 let focusMode = false;
 
@@ -36,7 +36,13 @@ async function init() {
   await storage.init();
 
   const savedTheme = localStorage.getItem('md-theme');
-  isDark = savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  if (savedTheme === 'light') currentTheme = 'folio';
+  else if (savedTheme === 'dark') currentTheme = 'ember';
+  else if (savedTheme) {
+    currentTheme = savedTheme;
+  } else {
+    currentTheme = 'solarized-light';
+  }
   applyTheme();
 
   const savedSidebar = localStorage.getItem('md-sidebar');
@@ -47,7 +53,7 @@ async function init() {
     container: document.getElementById('editor-mount'),
     doc: '',
     onChange: handleContentChange,
-    isDark,
+    isDark: isThemeDark(currentTheme),
   });
 
   let docs = await storage.list();
@@ -153,14 +159,16 @@ function updateStats(text) {
 
 // ─── Theme ────────────────────────────────────────────────────────────────
 
+function isThemeDark(theme) {
+  return ['solarized-dark', 'ember', 'monokai', 'nord', 'dracula'].includes(theme);
+}
+
 function applyTheme() {
-  document.body.setAttribute('data-theme', isDark ? 'dark' : 'light');
-  setHljsTheme(isDark);
-  if (editorView) setEditorTheme(editorView, isDark);
-  const icon = document.getElementById('icon-theme');
-  icon.innerHTML = isDark
-    ? `<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>`
-    : `<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>`;
+  document.body.setAttribute('data-theme', currentTheme);
+  setHljsTheme(currentTheme);
+  if (editorView) setEditorTheme(editorView, isThemeDark(currentTheme));
+  const sel = document.getElementById('sel-theme');
+  if (sel) sel.value = currentTheme;
 }
 
 // ─── Sidebar ──────────────────────────────────────────────────────────────
@@ -195,9 +203,9 @@ function setupToolbar() {
     renderSidebar();
   });
 
-  on('btn-theme', () => {
-    isDark = !isDark;
-    localStorage.setItem('md-theme', isDark ? 'dark' : 'light');
+  document.getElementById('sel-theme')?.addEventListener('change', (e) => {
+    currentTheme = e.target.value;
+    localStorage.setItem('md-theme', currentTheme);
     applyTheme();
   });
 
