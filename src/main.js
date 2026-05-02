@@ -301,7 +301,7 @@ function escapeHtml(str) {
 }
 
 function defaultContent() {
-  return `# Welcome to Markdown Editor
+  return `# Welcome to MDPreview
 
 A minimal, elegant writing environment. Your documents are stored locally in your browser using IndexedDB — no server required.
 
