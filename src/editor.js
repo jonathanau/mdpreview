@@ -125,6 +125,42 @@ export function setEditorContent(view, content) {
 export function wrapSelection(view, before, after) {
   const { from, to } = view.state.selection.main;
   const selected = view.state.sliceDoc(from, to);
+
+  // Toggle OFF: selected text already includes the markers exactly at the boundaries
+  if (selected && selected.length >= before.length + after.length) {
+    const selectedBefore = selected.slice(0, before.length);
+    const selectedAfter = selected.slice(selected.length - after.length);
+    if (selectedBefore === before && selectedAfter === after) {
+      const inner = selected.slice(before.length, selected.length - after.length);
+      // Only unwrap if inner content is not itself wrapped with the same markers
+      // (prevents **word** from being incorrectly unwrapped by * toggle)
+      if (!(inner.slice(0, before.length) === before && inner.slice(inner.length - after.length) === after && inner.length >= before.length + after.length)) {
+        view.dispatch({
+          changes: { from, to, insert: inner },
+          selection: { anchor: from, head: from + inner.length },
+        });
+        view.focus();
+        return;
+      }
+    }
+  }
+
+  // Toggle OFF: markers surround the selection (but aren't part of it)
+  const beforeText = view.state.sliceDoc(Math.max(0, from - before.length), from);
+  const afterText = view.state.sliceDoc(to, Math.min(view.state.doc.length, to + after.length));
+  if (beforeText === before && afterText === after && (from - before.length) >= 0) {
+    view.dispatch({
+      changes: [
+        { from: from - before.length, to: from, insert: '' },
+        { from: to, to: to + after.length, insert: '' },
+      ],
+      selection: { anchor: from - before.length, head: to - before.length },
+    });
+    view.focus();
+    return;
+  }
+
+  // Toggle ON: wrap the text with markers
   const text = selected || 'text';
   view.dispatch({
     changes: { from, to, insert: before + text + after },
