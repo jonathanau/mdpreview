@@ -9,6 +9,8 @@ import {
 } from './editor.js';
 import { renderMarkdown, setHljsTheme } from './preview.js';
 
+document.documentElement.classList.remove('loading');
+
 // ─── State ────────────────────────────────────────────────────────────────
 
 const storage = new Storage();
