@@ -185,8 +185,9 @@ html, body {
   gap: 2px;
   flex-shrink: 0;
   user-select: none;
-  overflow-x: auto;
-  scrollbar-width: none;
+  overflow: visible;
+  position: relative;
+  z-index: 100;
 }
 
 #toolbar::-webkit-scrollbar { display: none; }
@@ -217,6 +218,66 @@ html, body {
   align-items: center;
   gap: 2px;
   padding-left: 8px;
+}
+
+/* ─── Theme Switcher ─────────────────────────────────────────────────────── */
+
+.theme-switcher {
+  position: relative;
+}
+
+.theme-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 4px;
+  min-width: 160px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  display: none;
+  flex-direction: column;
+  z-index: 1000;
+  animation: theme-menu-in 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.theme-menu::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 0;
+  right: 0;
+  height: 8px;
+}
+
+@keyframes theme-menu-in {
+  from { opacity: 0; transform: translateY(-4px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.theme-switcher.open .theme-menu {
+  display: flex;
+}
+
+.theme-option {
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text-2);
+  transition: background 0.1s, color 0.1s;
+  white-space: nowrap;
+}
+
+.theme-option:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.theme-option.active {
+  background: var(--accent-soft);
+  color: var(--accent);
 }
 
 /* ─── Toolbar buttons ────────────────────────────────────────────────────── */
@@ -255,21 +316,7 @@ html, body {
   flex-shrink: 0;
 }
 
-.tb-select {
-  background: transparent;
-  border: none;
-  color: var(--text-2);
-  font-size: 12px;
-  font-family: 'JetBrains Mono', monospace;
-  padding: 4px 8px;
-  border-radius: 6px;
-  cursor: pointer;
-  outline: none;
-  transition: background 0.1s, color 0.1s;
-}
-
-.tb-select:hover { background: var(--surface-2); color: var(--text); }
-.tb-select option { background: var(--surface); color: var(--text); }
+/* .tb-select was removed in favor of custom dropdown */
 
 /* ─── Sidebar ─────────────────────────────────────────────────────────────── */
 

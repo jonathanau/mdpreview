@@ -188,8 +188,11 @@ function applyTheme() {
   document.documentElement.setAttribute('data-theme', currentTheme);
   setHljsTheme(currentTheme);
   if (editorView) setEditorTheme(editorView, isThemeDark(currentTheme));
-  const sel = document.getElementById('sel-theme');
-  if (sel) sel.value = currentTheme;
+  
+  // Update custom dropdown
+  document.querySelectorAll('.theme-option').forEach(opt => {
+    opt.classList.toggle('active', opt.dataset.value === currentTheme);
+  });
 }
 
 // ─── Sidebar ──────────────────────────────────────────────────────────────
@@ -233,10 +236,62 @@ function setupToolbar() {
     renderSidebar();
   });
 
-  document.getElementById('sel-theme')?.addEventListener('change', (e) => {
-    currentTheme = e.target.value;
-    localStorage.setItem('md-theme', currentTheme);
-    applyTheme();
+  // Theme switcher logic
+  const themeSwitcher = document.getElementById('theme-switcher');
+  const themeMenu = document.getElementById('theme-menu');
+  const btnTheme = document.getElementById('btn-theme');
+  let originalTheme = currentTheme;
+
+  const closeThemeMenu = () => {
+    themeSwitcher.classList.remove('open');
+    if (currentTheme !== originalTheme) {
+      currentTheme = originalTheme;
+      applyTheme();
+    }
+  };
+
+  btnTheme?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = themeSwitcher.classList.contains('open');
+    if (isOpen) {
+      closeThemeMenu();
+    } else {
+      themeSwitcher.classList.add('open');
+      originalTheme = currentTheme;
+    }
+  });
+
+  document.querySelectorAll('.theme-option').forEach(opt => {
+    opt.addEventListener('mouseenter', () => {
+      const theme = opt.dataset.value;
+      document.documentElement.setAttribute('data-theme', theme);
+      setHljsTheme(theme);
+      if (editorView) setEditorTheme(editorView, isThemeDark(theme));
+    });
+
+    opt.addEventListener('click', (e) => {
+      e.stopPropagation();
+      currentTheme = opt.dataset.value;
+      originalTheme = currentTheme;
+      localStorage.setItem('md-theme', currentTheme);
+      applyTheme();
+      themeSwitcher.classList.remove('open');
+    });
+  });
+
+  themeSwitcher?.addEventListener('mouseleave', () => {
+    if (themeSwitcher.classList.contains('open')) {
+      // Revert to original if we leave the switcher area
+      document.documentElement.setAttribute('data-theme', originalTheme);
+      setHljsTheme(originalTheme);
+      if (editorView) setEditorTheme(editorView, isThemeDark(originalTheme));
+    }
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!themeSwitcher?.contains(e.target)) {
+      closeThemeMenu();
+    }
   });
 
   on('btn-focus', () => { focusMode = !focusMode; applyFocus(); });
