@@ -1,6 +1,7 @@
 {
   "name": "mdpreview",
   "version": "1.0.0",
+  "description": "A minimal, elegant markdown editor with live preview running entirely in the browser",
   "type": "module",
   "license": "MIT",
   "scripts": {

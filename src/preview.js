@@ -23,7 +23,7 @@ marked.use(
   })
 );
 
-marked.setOptions({ gfm: true, breaks: true });
+marked.use({ gfm: true, breaks: true });
 
 // ─── Highlight.js theme injection ─────────────────────────────────────────
 
@@ -36,7 +36,7 @@ const hljsThemes = {
   'solarized-dark': solarizedDarkCssUrl,
   'monokai': monokaiCssUrl,
   'nord': nordCssUrl,
-  'dracula': draculaCssUrl,
+  'one-dark': draculaCssUrl,
   'github-light': githubCssUrl
 };
 
@@ -62,6 +62,6 @@ export function renderMarkdown(content) {
   const raw = marked.parse(content);
   return DOMPurify.sanitize(raw, {
     ADD_TAGS: ['iframe'],
-    ADD_ATTR: ['allow', 'allowfullscreen', 'frameborder', 'sandbox', 'scrolling'],
+    ADD_ATTR: ['frameborder', 'sandbox', 'scrolling'],
   });
 }

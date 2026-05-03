@@ -604,8 +604,14 @@ body.focus-mode .cm-scroller { font-size: 16px !important; }
 
 /* ─── Responsive ─────────────────────────────────────────────────────────── */
 
+.mobile-only { display: none; }
+
 @media (max-width: 680px) {
+  .mobile-only { display: flex; }
   #sidebar { display: none; }
-  #splitter, #preview-pane { display: none; }
+  #splitter { display: none; }
   #editor-pane { flex: 1; border: none; }
+  #preview-pane { display: none; }
+  body.mobile-preview #editor-pane { display: none; }
+  body.mobile-preview #preview-pane { display: flex; flex: 1; }
 }

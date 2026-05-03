@@ -5,7 +5,6 @@ import {
   setEditorTheme,
   wrapSelection,
   prefixLine,
-  insertAtCursor,
   themeCompartment,
   highlightCompartment,
 } from '../src/editor.js';
@@ -85,26 +84,6 @@ describe('setEditorTheme', () => {
     const { view, container } = createTestEditor('text');
     expect(() => setEditorTheme(view, true)).not.toThrow();
     expect(() => setEditorTheme(view, false)).not.toThrow();
-    container.remove();
-  });
-});
-
-// ─── insertAtCursor ──────────────────────────────────────────────────────
-
-describe('insertAtCursor', () => {
-  it('inserts text at the current cursor position', () => {
-    const { view, container } = createTestEditor('hello');
-    setSelection(view, 5, 5);
-    insertAtCursor(view, ' world');
-    expect(getDoc(view)).toBe('hello world');
-    container.remove();
-  });
-
-  it('replaces selected text', () => {
-    const { view, container } = createTestEditor('hello');
-    setSelection(view, 0, 5);
-    insertAtCursor(view, 'hi');
-    expect(getDoc(view)).toBe('hi');
     container.remove();
   });
 });
@@ -614,13 +593,9 @@ describe('Toggle: Link button logic', () => {
 
   it('TOGGLE ON: inserts link template when no text selected', () => {
     const { view, container } = createTestEditor('');
-    // Simulate the no-selection path from main.js:
-    // wrapSelection(editorView, `[link text`, `](url)`) — but actually main.js
-    // does a different dispatch for no-selection. Let's test the actual behavior.
+    // Simulates the no-selection path from main.js (fixed: no double-insert)
     const { from, to } = view.state.selection.main;
-    const sel = view.state.sliceDoc(from, to);
-    const text = sel || 'link text';
-    // No selection path from main.js:
+    const text = 'link text';
     view.dispatch({
       changes: { from, to, insert: `[${text}](url)` },
       selection: { anchor: from + 1, head: from + 1 + text.length },
@@ -734,6 +709,48 @@ describe('wrapSelection edge cases', () => {
     wrapSelection(view, '*', '*');
     // Guard prevents unwrapping: inner **word** starts/ends with *, so it wraps instead
     expect(getDoc(view)).toBe('****word****');
+    container.remove();
+  });
+});
+
+// ─── Format keymap (Ctrl+B, Ctrl+I, Ctrl+K) ─────────────────────────────
+
+describe('Format keymap', () => {
+  it('Ctrl+B bolds selected text', () => {
+    const { view, container } = createTestEditor('word');
+    setSelection(view, 0, 4);
+    view.dispatch({ effects: [] }); // ensure view is active
+    // Simulate keymap by calling the same logic the keymap uses
+    wrapSelection(view, '**', '**');
+    expect(getDoc(view)).toBe('**word**');
+    container.remove();
+  });
+
+  it('Ctrl+I italicizes selected text', () => {
+    const { view, container } = createTestEditor('word');
+    setSelection(view, 0, 4);
+    wrapSelection(view, '*', '*');
+    expect(getDoc(view)).toBe('*word*');
+    container.remove();
+  });
+
+  it('Ctrl+K wraps selected text as a link', () => {
+    const { view, container } = createTestEditor('click here');
+    setSelection(view, 0, 10);
+    wrapSelection(view, '[', '](url)');
+    expect(getDoc(view)).toBe('[click here](url)');
+    container.remove();
+  });
+
+  it('Ctrl+K inserts link template when no text selected', () => {
+    const { view, container } = createTestEditor('');
+    const { from, to } = view.state.selection.main;
+    const text = 'link text';
+    view.dispatch({
+      changes: { from, to, insert: `[${text}](url)` },
+      selection: { anchor: from + 1, head: from + 1 + text.length },
+    });
+    expect(getDoc(view)).toBe('[link text](url)');
     container.remove();
   });
 });

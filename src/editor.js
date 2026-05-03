@@ -65,6 +65,27 @@ export const dynamicHighlight = HighlightStyle.define([
   { tag: t.atom, color: 'var(--syntax-keyword)' },
 ]);
 
+// ─── Format keymap ────────────────────────────────────────────────────────
+
+const formatKeymap = keymap.of([
+  { key: 'Mod-b', run: (view) => { wrapSelection(view, '**', '**'); return true; } },
+  { key: 'Mod-i', run: (view) => { wrapSelection(view, '*', '*'); return true; } },
+  { key: 'Mod-k', run: (view) => {
+    const { from, to } = view.state.selection.main;
+    const sel = view.state.sliceDoc(from, to);
+    if (sel) {
+      wrapSelection(view, '[', '](url)');
+    } else {
+      const text = 'link text';
+      view.dispatch({
+        changes: { from, to, insert: `[${text}](url)` },
+        selection: { anchor: from + 1, head: from + 1 + text.length },
+      });
+    }
+    return true;
+  }},
+]);
+
 // ─── Compartments for runtime reconfiguration ──────────────────────────────
 
 export const themeCompartment = new Compartment();
@@ -83,6 +104,7 @@ export function createEditor({ container, doc = '', onChange, isDark = false }) 
         drawSelection(),
         bracketMatching(),
         keymap.of([...defaultKeymap, ...historyKeymap, indentWithTab]),
+        formatKeymap,
         markdown({ base: markdownLanguage }),
         baseTheme,
         themeCompartment.of(isDark ? darkEditorTheme : lightEditorTheme),
@@ -180,11 +202,5 @@ export function prefixLine(view, prefix) {
       changes: { from: line.from, to: line.from, insert: prefix },
     });
   }
-  view.focus();
-}
-
-export function insertAtCursor(view, text) {
-  const { from, to } = view.state.selection.main;
-  view.dispatch({ changes: { from, to, insert: text } });
   view.focus();
 }

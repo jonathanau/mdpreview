@@ -6,7 +6,6 @@ import {
   setEditorContent,
   wrapSelection,
   prefixLine,
-  insertAtCursor,
 } from './editor.js';
 import { renderMarkdown, setHljsTheme } from './preview.js';
 
@@ -72,6 +71,13 @@ async function init() {
 // ─── Document management ──────────────────────────────────────────────────
 
 async function openDoc(id) {
+  // Flush any pending save for the current document before switching
+  if (saveTimer && currentDoc) {
+    clearTimeout(saveTimer);
+    saveTimer = null;
+    await storage.save(currentDoc);
+    statSaved.textContent = 'saved';
+  }
   const doc = await storage.get(id);
   if (!doc) return;
   currentDoc = doc;
@@ -110,6 +116,7 @@ async function renderSidebar() {
     el.querySelector('.doc-delete').addEventListener('click', async (e) => {
       e.stopPropagation();
       if (docs.length === 1) { showToast('Cannot delete the last document'); return; }
+      if (!confirm('Delete this document?')) return;
       await storage.delete(doc.id);
       const remaining = await storage.list();
       if (currentDoc && currentDoc.id === doc.id) {
@@ -130,9 +137,15 @@ function handleContentChange(content) {
   statSaved.textContent = 'saving…';
   clearTimeout(saveTimer);
   saveTimer = setTimeout(async () => {
-    await storage.save(currentDoc);
-    statSaved.textContent = 'saved';
-    renderSidebar();
+    try {
+      await storage.save(currentDoc);
+      statSaved.textContent = 'saved';
+      renderSidebar();
+    } catch (err) {
+      console.error('Save failed:', err);
+      statSaved.textContent = 'save failed';
+      showToast('Save failed');
+    }
   }, 600);
 }
 
@@ -211,6 +224,12 @@ function setupToolbar() {
 
   on('btn-focus', () => { focusMode = !focusMode; applyFocus(); });
 
+  on('btn-preview-toggle', () => {
+    document.body.classList.toggle('mobile-preview');
+    const btn = document.getElementById('btn-preview-toggle');
+    btn?.classList.toggle('active', document.body.classList.contains('mobile-preview'));
+  });
+
   on('btn-download-md', () => {
     if (!currentDoc) return;
     const content = editorView.state.doc.toString();
@@ -261,9 +280,10 @@ function setupToolbar() {
   on('tb-link', () => {
     const { from, to } = editorView.state.selection.main;
     const sel = editorView.state.sliceDoc(from, to);
-    const text = sel || 'link text';
-    wrapSelection(editorView, `[${sel ? '' : text}`, `${sel ? '' : ''}](url)`);
-    if (!sel) {
+    if (sel) {
+      wrapSelection(editorView, '[', '](url)');
+    } else {
+      const text = 'link text';
       editorView.dispatch({
         changes: { from, to, insert: `[${text}](url)` },
         selection: { anchor: from + 1, head: from + 1 + text.length },
@@ -286,7 +306,8 @@ function setupSplitter() {
     startX = e.clientX;
     startW = editorPane.getBoundingClientRect().width;
     splitter.classList.add('dragging');
-    document.body.style.cssText += 'cursor:col-resize;user-select:none;';
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
   });
 
   document.addEventListener('mousemove', (e) => {
