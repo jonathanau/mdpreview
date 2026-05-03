@@ -46,3 +46,6 @@ build/
 .netlify
 .firebase
 
+# Kilo CLI
+.kilo/
+
