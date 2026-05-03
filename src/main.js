@@ -17,6 +17,7 @@ let currentDoc = null;
 let saveTimer = null;
 let currentTheme = 'solarized-light';
 let sidebarOpen = true;
+let sidebarWidth = 220; // Default width
 let focusMode = false;
 
 // ─── DOM refs ─────────────────────────────────────────────────────────────
@@ -46,6 +47,11 @@ async function init() {
 
   const savedSidebar = localStorage.getItem('md-sidebar');
   sidebarOpen = savedSidebar !== 'closed';
+  
+  const savedWidth = localStorage.getItem('md-sidebar-width');
+  if (savedWidth) {
+    sidebarWidth = parseInt(savedWidth, 10);
+  }
   applySidebar();
 
   editorView = createEditor({
@@ -189,7 +195,16 @@ function applyTheme() {
 // ─── Sidebar ──────────────────────────────────────────────────────────────
 
 function applySidebar() {
-  document.getElementById('sidebar').classList.toggle('hidden', !sidebarOpen);
+  const sidebar = document.getElementById('sidebar');
+  const splitter = document.getElementById('sidebar-splitter');
+  sidebar.classList.toggle('hidden', !sidebarOpen);
+  if (sidebarOpen) {
+    sidebar.style.width = `${sidebarWidth}px`;
+    splitter.style.display = 'block';
+  } else {
+    sidebar.style.width = '0';
+    splitter.style.display = 'none';
+  }
   document.getElementById('btn-sidebar').classList.toggle('active', sidebarOpen);
 }
 
@@ -299,35 +314,67 @@ function setupToolbar() {
 // ─── Splitter ─────────────────────────────────────────────────────────────
 
 function setupSplitter() {
-  const splitter = document.getElementById('splitter');
+  const main = document.getElementById('main');
+  
+  // Sidebar splitter
+  const sidebarSplitter = document.getElementById('sidebar-splitter');
+  const sidebar = document.getElementById('sidebar');
+  let sidebarDragging = false;
+
+  sidebarSplitter.addEventListener('mousedown', (e) => {
+    sidebarDragging = true;
+    sidebarSplitter.classList.add('dragging');
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+  });
+
+  // Main splitter (Editor/Preview)
+  const mainSplitter = document.getElementById('main-splitter');
   const editorPane = document.getElementById('editor-pane');
   const previewPane = document.getElementById('preview-pane');
-  let dragging = false, startX = 0, startW = 0;
+  let mainDragging = false, startX = 0, startW = 0;
 
-  splitter.addEventListener('mousedown', (e) => {
-    dragging = true;
+  mainSplitter.addEventListener('mousedown', (e) => {
+    mainDragging = true;
     startX = e.clientX;
     startW = editorPane.getBoundingClientRect().width;
-    splitter.classList.add('dragging');
+    mainSplitter.classList.add('dragging');
     document.body.style.cursor = 'col-resize';
     document.body.style.userSelect = 'none';
   });
 
   document.addEventListener('mousemove', (e) => {
-    if (!dragging) return;
-    const main = document.getElementById('main');
-    const total = main.getBoundingClientRect().width;
-    const newW = Math.max(200, Math.min(total - 200, startW + (e.clientX - startX)));
-    editorPane.style.flex = `0 0 ${((newW / total) * 100).toFixed(2)}%`;
-    previewPane.style.flex = '1';
+    if (sidebarDragging) {
+      const mainRect = main.getBoundingClientRect();
+      const newW = Math.max(160, Math.min(450, e.clientX - mainRect.left));
+      sidebarWidth = newW;
+      sidebar.style.width = `${newW}px`;
+      localStorage.setItem('md-sidebar-width', newW);
+    }
+
+    if (mainDragging) {
+      const total = main.getBoundingClientRect().width;
+      const sidebarW = sidebarOpen ? sidebar.getBoundingClientRect().width : 0;
+      const availableWidth = total - (sidebarOpen ? sidebarW + 4 : 0) - 4; // subtract splitters
+      
+      const mainRect = main.getBoundingClientRect();
+      const relativeX = e.clientX - mainRect.left - (sidebarOpen ? sidebarW + 4 : 0);
+      
+      const newW = Math.max(200, Math.min(availableWidth - 200, relativeX));
+      editorPane.style.flex = `0 0 ${((newW / availableWidth) * 100).toFixed(2)}%`;
+      previewPane.style.flex = '1';
+    }
   });
 
   document.addEventListener('mouseup', () => {
-    if (!dragging) return;
-    dragging = false;
-    splitter.classList.remove('dragging');
-    document.body.style.cursor = '';
-    document.body.style.userSelect = '';
+    if (sidebarDragging || mainDragging) {
+      sidebarDragging = false;
+      mainDragging = false;
+      sidebarSplitter.classList.remove('dragging');
+      mainSplitter.classList.remove('dragging');
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    }
   });
 }
 

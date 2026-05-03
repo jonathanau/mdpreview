@@ -279,14 +279,12 @@ html, body {
   display: flex;
   flex-direction: column;
   background: var(--surface-2);
-  border-right: 1px solid var(--border);
+  border-right: none; /* Splitter provides the visual border */
   overflow: hidden;
-  transition: width 0.2s;
 }
 
 #sidebar.hidden {
-  width: 0;
-  border-right: none;
+  width: 0 !important;
 }
 
 #sidebar-header {
@@ -425,15 +423,26 @@ html, body {
 
 /* ─── Splitter ────────────────────────────────────────────────────────────── */
 
-#splitter {
+.splitter {
   width: 4px;
   cursor: col-resize;
   background: var(--surface-2);
+  border-right: 1px solid var(--border);
   flex-shrink: 0;
-  transition: background 0.15s;
+  transition: background 0.15s, opacity 0.15s;
+  z-index: 10;
 }
 
-#splitter:hover, #splitter.dragging { background: var(--accent); opacity: 0.35; }
+.splitter:hover, .splitter.dragging { 
+  background: var(--accent); 
+  opacity: 0.5;
+  border-right-color: transparent;
+}
+
+#main-splitter {
+  border-left: 1px solid var(--border);
+  border-right: none;
+}
 
 /* ─── Preview pane ────────────────────────────────────────────────────────── */
 
@@ -596,8 +605,9 @@ html, body {
 
 /* ─── Focus mode ─────────────────────────────────────────────────────────── */
 
-body.focus-mode #sidebar { width: 0; border: none; }
-body.focus-mode #splitter,
+body.focus-mode #sidebar,
+body.focus-mode #sidebar-splitter { width: 0; display: none; }
+body.focus-mode #main-splitter,
 body.focus-mode #preview-pane { display: none; }
 body.focus-mode #editor-pane { flex: 1; border: none; }
 body.focus-mode .cm-content { padding: 48px max(10%, 80px) !important; }
