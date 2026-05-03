@@ -211,7 +211,7 @@ function setupToolbar() {
 
   on('btn-focus', () => { focusMode = !focusMode; applyFocus(); });
 
-  on('btn-download', () => {
+  on('btn-download-md', () => {
     if (!currentDoc) return;
     const content = editorView.state.doc.toString();
     const title = extractTitle(content) || 'document';
@@ -223,9 +223,26 @@ function setupToolbar() {
     showToast('Downloaded');
   });
 
+  on('btn-copy-md', () => {
+    const content = editorView.state.doc.toString();
+    navigator.clipboard.writeText(content).then(() => showToast('Markdown copied'));
+  });
+
   on('btn-copy-html', () => {
     const html = renderMarkdown(editorView.state.doc.toString());
     navigator.clipboard.writeText(html).then(() => showToast('HTML copied'));
+  });
+
+  on('btn-download-html', () => {
+    const content = editorView.state.doc.toString();
+    const title = extractTitle(content) || 'document';
+    const html = renderMarkdown(content);
+    const blob = new Blob([html], { type: 'text/html' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `${title.replace(/[^a-z0-9]/gi, '-').toLowerCase()}.html`;
+    a.click();
+    showToast('Downloaded');
   });
 
   on('tb-bold', () => wrapSelection(editorView, '**', '**'));

@@ -43,8 +43,6 @@
           <svg viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
           Focus
         </button>
-        <button class="tb-btn" title="Copy as HTML" id="btn-copy-html"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
-        <button class="tb-btn" title="Download .md" id="btn-download"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
         <select id="sel-theme" class="tb-select" title="Theme">
           <option value="solarized-light">Solarized Light</option>
           <option value="solarized-dark">Solarized Dark</option>
@@ -70,14 +68,24 @@
       </div>
 
       <div id="editor-pane">
-        <div class="pane-header">editor</div>
+        <div class="pane-header">editor
+          <div class="pane-actions">
+            <button class="tb-btn" title="Copy Markdown" id="btn-copy-md"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+            <button class="tb-btn" title="Download .md" id="btn-download-md"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+          </div>
+        </div>
         <div id="editor-mount"></div>
       </div>
 
       <div id="splitter"></div>
 
       <div id="preview-pane">
-        <div class="pane-header">preview</div>
+        <div class="pane-header">preview
+          <div class="pane-actions">
+            <button class="tb-btn" title="Copy HTML" id="btn-copy-html"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+            <button class="tb-btn" title="Download .html" id="btn-download-html"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+          </div>
+        </div>
         <div id="preview">
           <div class="preview-empty" id="preview-empty">Start writing to see a preview</div>
           <div class="preview-content" id="preview-content"></div>

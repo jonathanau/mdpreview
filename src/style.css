@@ -377,6 +377,7 @@ html, body {
 .pane-header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   padding: 0 16px;
   height: 36px;
   background: var(--surface-2);
@@ -387,6 +388,17 @@ html, body {
   text-transform: uppercase;
   letter-spacing: 0.08em;
   flex-shrink: 0;
+}
+
+.pane-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.pane-actions .tb-btn {
+  width: 28px;
+  height: 28px;
 }
 
 #editor-mount {
