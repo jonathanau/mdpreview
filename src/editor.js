@@ -204,3 +204,36 @@ export function prefixLine(view, prefix) {
   }
   view.focus();
 }
+
+export function toggleHeading(view, level) {
+  const { from } = view.state.selection.main;
+  const line = view.state.doc.lineAt(from);
+  const lineText = line.text;
+
+  const headingPrefixes = ['# ', '## ', '### ', '#### ', '##### ', '###### '];
+  const targetPrefix = headingPrefixes[level - 1];
+
+  // Check if line starts with any heading prefix
+  const headingMatch = lineText.match(/^(#{1,6})\s+/);
+
+  if (headingMatch) {
+    const currentLevel = headingMatch[1].length;
+    if (currentLevel === level) {
+      // Same level: remove the heading prefix entirely
+      view.dispatch({
+        changes: { from: line.from, to: line.from + headingMatch[0].length, insert: '' },
+      });
+    } else {
+      // Different level: replace the current heading prefix with the target level
+      view.dispatch({
+        changes: { from: line.from, to: line.from + headingMatch[0].length, insert: targetPrefix },
+      });
+    }
+  } else {
+    // Not a heading: just add the target prefix
+    view.dispatch({
+      changes: { from: line.from, to: line.from, insert: targetPrefix },
+    });
+  }
+  view.focus();
+}

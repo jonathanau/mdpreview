@@ -5,6 +5,7 @@ import {
   setEditorTheme,
   wrapSelection,
   prefixLine,
+  toggleHeading,
   themeCompartment,
   highlightCompartment,
 } from '../src/editor.js';
@@ -375,11 +376,13 @@ describe('prefixLine', () => {
 // ─── Toggle ON/OFF for prefixLine-based buttons ──────────────────────────
 // H1 (# ), H2 (## ), H3 (### ), UL (- ), OL (1. ), Blockquote (> )
 
-describe('Toggle: H1 button (prefixLine with "# ")', () => {
+// ─── Toggle: H1 button (toggleHeading with level 1) ──────────────────────
+
+describe('Toggle: H1 button (toggleHeading with level 1)', () => {
   it('TOGGLE ON: adds # prefix to a line', () => {
     const { view, container } = createTestEditor('Title');
     setSelection(view, 0, 0);
-    prefixLine(view, '# ');
+    toggleHeading(view, 1);
     expect(getDoc(view)).toBe('# Title');
     container.remove();
   });
@@ -387,7 +390,7 @@ describe('Toggle: H1 button (prefixLine with "# ")', () => {
   it('TOGGLE OFF: removes # prefix from a line', () => {
     const { view, container } = createTestEditor('# Title');
     setSelection(view, 0, 0);
-    prefixLine(view, '# ');
+    toggleHeading(view, 1);
     expect(getDoc(view)).toBe('Title');
     container.remove();
   });
@@ -395,28 +398,35 @@ describe('Toggle: H1 button (prefixLine with "# ")', () => {
   it('TOGGLE ON then OFF: press H1 twice toggles on then off', () => {
     const { view, container } = createTestEditor('Title');
     setSelection(view, 0, 0);
-    prefixLine(view, '# ');
+    toggleHeading(view, 1);
     expect(getDoc(view)).toBe('# Title');
-    prefixLine(view, '# ');
+    toggleHeading(view, 1);
     expect(getDoc(view)).toBe('Title');
     container.remove();
   });
 
-  it('does not remove ## prefix when toggling # (exact prefix match)', () => {
+  it('DOWNGRADE: H2 on H1 replaces # with ##', () => {
+    const { view, container } = createTestEditor('# Title');
+    setSelection(view, 0, 0);
+    toggleHeading(view, 2);
+    expect(getDoc(view)).toBe('## Title');
+    container.remove();
+  });
+
+  it('UPGRADE: H1 on H2 replaces ## with #', () => {
     const { view, container } = createTestEditor('## Title');
     setSelection(view, 0, 0);
-    prefixLine(view, '# ');
-    // "# " is not the same as "## ", so it adds "# " before "## Title"
-    expect(getDoc(view)).toBe('# ## Title');
+    toggleHeading(view, 1);
+    expect(getDoc(view)).toBe('# Title');
     container.remove();
   });
 });
 
-describe('Toggle: H2 button (prefixLine with "## ")', () => {
+describe('Toggle: H2 button (toggleHeading with level 2)', () => {
   it('TOGGLE ON: adds ## prefix to a line', () => {
     const { view, container } = createTestEditor('Subtitle');
     setSelection(view, 0, 0);
-    prefixLine(view, '## ');
+    toggleHeading(view, 2);
     expect(getDoc(view)).toBe('## Subtitle');
     container.remove();
   });
@@ -424,7 +434,7 @@ describe('Toggle: H2 button (prefixLine with "## ")', () => {
   it('TOGGLE OFF: removes ## prefix from a line', () => {
     const { view, container } = createTestEditor('## Subtitle');
     setSelection(view, 0, 0);
-    prefixLine(view, '## ');
+    toggleHeading(view, 2);
     expect(getDoc(view)).toBe('Subtitle');
     container.remove();
   });
@@ -432,27 +442,35 @@ describe('Toggle: H2 button (prefixLine with "## ")', () => {
   it('TOGGLE ON then OFF: press H2 twice toggles on then off', () => {
     const { view, container } = createTestEditor('Subtitle');
     setSelection(view, 0, 0);
-    prefixLine(view, '## ');
+    toggleHeading(view, 2);
     expect(getDoc(view)).toBe('## Subtitle');
-    prefixLine(view, '## ');
+    toggleHeading(view, 2);
     expect(getDoc(view)).toBe('Subtitle');
     container.remove();
   });
 
-  it('does not remove ### prefix when toggling ## (exact prefix match)', () => {
+  it('DOWNGRADE: H3 on H2 replaces ## with ###', () => {
+    const { view, container } = createTestEditor('## Subtitle');
+    setSelection(view, 0, 0);
+    toggleHeading(view, 3);
+    expect(getDoc(view)).toBe('### Subtitle');
+    container.remove();
+  });
+
+  it('UPGRADE: H2 on H3 replaces ### with ##', () => {
     const { view, container } = createTestEditor('### Subtitle');
     setSelection(view, 0, 0);
-    prefixLine(view, '## ');
-    expect(getDoc(view)).toBe('## ### Subtitle');
+    toggleHeading(view, 2);
+    expect(getDoc(view)).toBe('## Subtitle');
     container.remove();
   });
 });
 
-describe('Toggle: H3 button (prefixLine with "### ")', () => {
+describe('Toggle: H3 button (toggleHeading with level 3)', () => {
   it('TOGGLE ON: adds ### prefix to a line', () => {
     const { view, container } = createTestEditor('Section');
     setSelection(view, 0, 0);
-    prefixLine(view, '### ');
+    toggleHeading(view, 3);
     expect(getDoc(view)).toBe('### Section');
     container.remove();
   });
@@ -460,7 +478,7 @@ describe('Toggle: H3 button (prefixLine with "### ")', () => {
   it('TOGGLE OFF: removes ### prefix from a line', () => {
     const { view, container } = createTestEditor('### Section');
     setSelection(view, 0, 0);
-    prefixLine(view, '### ');
+    toggleHeading(view, 3);
     expect(getDoc(view)).toBe('Section');
     container.remove();
   });
@@ -468,18 +486,138 @@ describe('Toggle: H3 button (prefixLine with "### ")', () => {
   it('TOGGLE ON then OFF: press H3 twice toggles on then off', () => {
     const { view, container } = createTestEditor('Section');
     setSelection(view, 0, 0);
-    prefixLine(view, '### ');
+    toggleHeading(view, 3);
     expect(getDoc(view)).toBe('### Section');
-    prefixLine(view, '### ');
+    toggleHeading(view, 3);
     expect(getDoc(view)).toBe('Section');
     container.remove();
   });
 
-  it('does not remove ## prefix when toggling ### (exact prefix match)', () => {
+  it('UPGRADE: H3 on H1 replaces # with ###', () => {
+    const { view, container } = createTestEditor('# Section');
+    setSelection(view, 0, 0);
+    toggleHeading(view, 3);
+    expect(getDoc(view)).toBe('### Section');
+    container.remove();
+  });
+
+  it('DOWNGRADE: H1 on H3 replaces ### with #', () => {
+    const { view, container } = createTestEditor('### Section');
+    setSelection(view, 0, 0);
+    toggleHeading(view, 1);
+    expect(getDoc(view)).toBe('# Section');
+    container.remove();
+  });
+
+  it('UPGRADE: H3 on H2 replaces ## with ###', () => {
     const { view, container } = createTestEditor('## Section');
     setSelection(view, 0, 0);
-    prefixLine(view, '### ');
-    expect(getDoc(view)).toBe('### ## Section');
+    toggleHeading(view, 3);
+    expect(getDoc(view)).toBe('### Section');
+    container.remove();
+  });
+
+  it('DOWNGRADE: H2 on H3 replaces ### with ##', () => {
+    const { view, container } = createTestEditor('### Section');
+    setSelection(view, 0, 0);
+    toggleHeading(view, 2);
+    expect(getDoc(view)).toBe('## Section');
+    container.remove();
+  });
+});
+
+describe('Toggle: H4 button (toggleHeading with level 4)', () => {
+  it('TOGGLE ON: adds #### prefix to a line', () => {
+    const { view, container } = createTestEditor('Subsection');
+    setSelection(view, 0, 0);
+    toggleHeading(view, 4);
+    expect(getDoc(view)).toBe('#### Subsection');
+    container.remove();
+  });
+
+  it('UPGRADE: H4 on H2 replaces ## with ####', () => {
+    const { view, container } = createTestEditor('## Subsection');
+    setSelection(view, 0, 0);
+    toggleHeading(view, 4);
+    expect(getDoc(view)).toBe('#### Subsection');
+    container.remove();
+  });
+
+  it('DOWNGRADE: H2 on H4 replaces #### with ##', () => {
+    const { view, container } = createTestEditor('#### Subsection');
+    setSelection(view, 0, 0);
+    toggleHeading(view, 2);
+    expect(getDoc(view)).toBe('## Subsection');
+    container.remove();
+  });
+});
+
+describe('Toggle: H5 button (toggleHeading with level 5)', () => {
+  it('TOGGLE ON: adds ##### prefix to a line', () => {
+    const { view, container } = createTestEditor('Minor heading');
+    setSelection(view, 0, 0);
+    toggleHeading(view, 5);
+    expect(getDoc(view)).toBe('##### Minor heading');
+    container.remove();
+  });
+
+  it('UPGRADE: H5 on H3 replaces ### with #####', () => {
+    const { view, container } = createTestEditor('### Minor heading');
+    setSelection(view, 0, 0);
+    toggleHeading(view, 5);
+    expect(getDoc(view)).toBe('##### Minor heading');
+    container.remove();
+  });
+
+  it('DOWNGRADE: H3 on H5 replaces ##### with ###', () => {
+    const { view, container } = createTestEditor('##### Minor heading');
+    setSelection(view, 0, 0);
+    toggleHeading(view, 3);
+    expect(getDoc(view)).toBe('### Minor heading');
+    container.remove();
+  });
+});
+
+describe('Toggle: H6 button (toggleHeading with level 6)', () => {
+  it('TOGGLE ON: adds ###### prefix to a line', () => {
+    const { view, container } = createTestEditor('Tiny heading');
+    setSelection(view, 0, 0);
+    toggleHeading(view, 6);
+    expect(getDoc(view)).toBe('###### Tiny heading');
+    container.remove();
+  });
+
+  it('UPGRADE: H6 on H4 replaces #### with ######', () => {
+    const { view, container } = createTestEditor('#### Tiny heading');
+    setSelection(view, 0, 0);
+    toggleHeading(view, 6);
+    expect(getDoc(view)).toBe('###### Tiny heading');
+    container.remove();
+  });
+
+  it('DOWNGRADE: H1 on H6 replaces ###### with #', () => {
+    const { view, container } = createTestEditor('###### Tiny heading');
+    setSelection(view, 0, 0);
+    toggleHeading(view, 1);
+    expect(getDoc(view)).toBe('# Tiny heading');
+    container.remove();
+  });
+});
+
+describe('toggleHeading on multi-line documents', () => {
+  it('toggles H1 on a line in the middle without affecting other lines', () => {
+    const { view, container } = createTestEditor('Title\nBody\nFooter');
+    setSelection(view, 6, 6); // cursor on "Body"
+    toggleHeading(view, 1);
+    expect(getDoc(view)).toBe('Title\n# Body\nFooter');
+    container.remove();
+  });
+
+  it('downgrades H3 to H2 on a line in the middle without affecting other lines', () => {
+    const { view, container } = createTestEditor('# Title\n### Body\nFooter');
+    setSelection(view, 9, 9); // cursor on "### Body"
+    toggleHeading(view, 2);
+    expect(getDoc(view)).toBe('# Title\n## Body\nFooter');
     container.remove();
   });
 });
