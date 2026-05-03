@@ -7,6 +7,16 @@
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="stylesheet" href="/fonts/fonts.css" />
   <title>MDPreview</title>
+  <script>
+    (function() {
+      const saved = localStorage.getItem('md-theme');
+      let theme = 'solarized-light';
+      if (saved === 'light') theme = 'folio';
+      else if (saved === 'dark') theme = 'ember';
+      else if (saved) theme = saved;
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
   <style>
     html.loading body { visibility: hidden; }
   </style>

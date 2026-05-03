@@ -9,8 +9,6 @@ import {
 } from './editor.js';
 import { renderMarkdown, setHljsTheme } from './preview.js';
 
-document.documentElement.classList.remove('loading');
-
 // ─── State ────────────────────────────────────────────────────────────────
 
 const storage = new Storage();
@@ -68,6 +66,8 @@ async function init() {
   renderSidebar();
   setupToolbar();
   setupSplitter();
+
+  document.documentElement.classList.remove('loading');
 }
 
 // ─── Document management ──────────────────────────────────────────────────
@@ -179,7 +179,7 @@ function isThemeDark(theme) {
 }
 
 function applyTheme() {
-  document.body.setAttribute('data-theme', currentTheme);
+  document.documentElement.setAttribute('data-theme', currentTheme);
   setHljsTheme(currentTheme);
   if (editorView) setEditorTheme(editorView, isThemeDark(currentTheme));
   const sel = document.getElementById('sel-theme');
