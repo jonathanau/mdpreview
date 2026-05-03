@@ -47,7 +47,7 @@ async function init() {
 
   const savedSidebar = localStorage.getItem('md-sidebar');
   sidebarOpen = savedSidebar !== 'closed';
-  
+
   const savedWidth = localStorage.getItem('md-sidebar-width');
   if (savedWidth) {
     sidebarWidth = parseInt(savedWidth, 10);
@@ -188,7 +188,7 @@ function applyTheme() {
   document.documentElement.setAttribute('data-theme', currentTheme);
   setHljsTheme(currentTheme);
   if (editorView) setEditorTheme(editorView, isThemeDark(currentTheme));
-  
+
   // Update custom dropdown
   document.querySelectorAll('.theme-option').forEach(opt => {
     opt.classList.toggle('active', opt.dataset.value === currentTheme);
@@ -370,7 +370,7 @@ function setupToolbar() {
 
 function setupSplitter() {
   const main = document.getElementById('main');
-  
+
   // Sidebar splitter
   const sidebarSplitter = document.getElementById('sidebar-splitter');
   const sidebar = document.getElementById('sidebar');
@@ -411,10 +411,10 @@ function setupSplitter() {
       const total = main.getBoundingClientRect().width;
       const sidebarW = sidebarOpen ? sidebar.getBoundingClientRect().width : 0;
       const availableWidth = total - (sidebarOpen ? sidebarW + 4 : 0) - 4; // subtract splitters
-      
+
       const mainRect = main.getBoundingClientRect();
       const relativeX = e.clientX - mainRect.left - (sidebarOpen ? sidebarW + 4 : 0);
-      
+
       const newW = Math.max(200, Math.min(availableWidth - 200, relativeX));
       editorPane.style.flex = `0 0 ${((newW / availableWidth) * 100).toFixed(2)}%`;
       previewPane.style.flex = '1';
@@ -449,7 +449,7 @@ function escapeHtml(str) {
 function defaultContent() {
   return `# Welcome to MDPreview
 
-A minimal, elegant writing environment. Your documents are stored locally in your browser using IndexedDB — no server required.
+A minimal, elegant writing environment. Your documents are stored locally in your browser using IndexedDB; no server required.
 
 ## Features
 
