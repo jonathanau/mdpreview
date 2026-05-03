@@ -160,20 +160,31 @@ describe('Toggle: Bold button (wrapSelection with **)', () => {
     container.remove();
   });
 
-  it('TOGGLE OFF: applying bold to already-bold text adds another layer (no unwrapping)', () => {
-    // wrapSelection does NOT toggle off — it always wraps
-    const { view, container } = createTestEditor('**word**');
-    setSelection(view, 2, 6); // select "word" inside **...**
-    wrapSelection(view, '**', '**');
-    expect(getDoc(view)).toBe('****word****');
-    container.remove();
-  });
-
-  it('TOGGLE OFF: selecting entire bold text including markers still wraps', () => {
+  it('TOGGLE OFF: pressing bold on **word** (full selection including markers) removes **', () => {
     const { view, container } = createTestEditor('**word**');
     setSelection(view, 0, 8); // select "**word**"
     wrapSelection(view, '**', '**');
-    expect(getDoc(view)).toBe('****word****');
+    expect(getDoc(view)).toBe('word');
+    container.remove();
+  });
+
+  it('TOGGLE OFF: pressing bold when cursor is inside **word** (selection inside markers) removes **', () => {
+    const { view, container } = createTestEditor('**word**');
+    setSelection(view, 2, 6); // select "word" inside **...**
+    wrapSelection(view, '**', '**');
+    expect(getDoc(view)).toBe('word');
+    container.remove();
+  });
+
+  it('TOGGLE ON then OFF: press bold twice on plain text toggles formatting on then off', () => {
+    const { view, container } = createTestEditor('word');
+    // First press: toggle ON
+    setSelection(view, 0, 4);
+    wrapSelection(view, '**', '**');
+    expect(getDoc(view)).toBe('**word**');
+    // Second press: toggle OFF (selection is now inside the markers)
+    wrapSelection(view, '**', '**');
+    expect(getDoc(view)).toBe('word');
     container.remove();
   });
 });
@@ -195,11 +206,29 @@ describe('Toggle: Italic button (wrapSelection with *)', () => {
     container.remove();
   });
 
-  it('TOGGLE OFF: applying italic to already-italic text adds another layer', () => {
+  it('TOGGLE OFF: pressing italic on *word* (full selection including markers) removes *', () => {
+    const { view, container } = createTestEditor('*word*');
+    setSelection(view, 0, 6);
+    wrapSelection(view, '*', '*');
+    expect(getDoc(view)).toBe('word');
+    container.remove();
+  });
+
+  it('TOGGLE OFF: pressing italic when selection is inside *word* removes *', () => {
     const { view, container } = createTestEditor('*word*');
     setSelection(view, 1, 5);
     wrapSelection(view, '*', '*');
-    expect(getDoc(view)).toBe('**word**');
+    expect(getDoc(view)).toBe('word');
+    container.remove();
+  });
+
+  it('TOGGLE ON then OFF: press italic twice on plain text toggles formatting on then off', () => {
+    const { view, container } = createTestEditor('word');
+    setSelection(view, 0, 4);
+    wrapSelection(view, '*', '*');
+    expect(getDoc(view)).toBe('*word*');
+    wrapSelection(view, '*', '*');
+    expect(getDoc(view)).toBe('word');
     container.remove();
   });
 });
@@ -221,11 +250,29 @@ describe('Toggle: Strikethrough button (wrapSelection with ~~)', () => {
     container.remove();
   });
 
-  it('TOGGLE OFF: applying strikethrough to already-struck text adds another layer', () => {
+  it('TOGGLE OFF: pressing strikethrough on ~~word~~ (full selection) removes ~~', () => {
+    const { view, container } = createTestEditor('~~word~~');
+    setSelection(view, 0, 8);
+    wrapSelection(view, '~~', '~~');
+    expect(getDoc(view)).toBe('word');
+    container.remove();
+  });
+
+  it('TOGGLE OFF: pressing strikethrough when selection is inside ~~word~~ removes ~~', () => {
     const { view, container } = createTestEditor('~~word~~');
     setSelection(view, 2, 6);
     wrapSelection(view, '~~', '~~');
-    expect(getDoc(view)).toBe('~~~~word~~~~');
+    expect(getDoc(view)).toBe('word');
+    container.remove();
+  });
+
+  it('TOGGLE ON then OFF: press strikethrough twice on plain text toggles on then off', () => {
+    const { view, container } = createTestEditor('word');
+    setSelection(view, 0, 4);
+    wrapSelection(view, '~~', '~~');
+    expect(getDoc(view)).toBe('~~word~~');
+    wrapSelection(view, '~~', '~~');
+    expect(getDoc(view)).toBe('word');
     container.remove();
   });
 });
@@ -247,11 +294,29 @@ describe('Toggle: Inline code button (wrapSelection with `)', () => {
     container.remove();
   });
 
-  it('TOGGLE OFF: applying code to already-code text adds another layer', () => {
+  it('TOGGLE OFF: pressing code on `word` (full selection) removes backticks', () => {
+    const { view, container } = createTestEditor('`word`');
+    setSelection(view, 0, 6);
+    wrapSelection(view, '`', '`');
+    expect(getDoc(view)).toBe('word');
+    container.remove();
+  });
+
+  it('TOGGLE OFF: pressing code when selection is inside `word` removes backticks', () => {
     const { view, container } = createTestEditor('`word`');
     setSelection(view, 1, 5);
     wrapSelection(view, '`', '`');
-    expect(getDoc(view)).toBe('``word``');
+    expect(getDoc(view)).toBe('word');
+    container.remove();
+  });
+
+  it('TOGGLE ON then OFF: press code twice on plain text toggles on then off', () => {
+    const { view, container } = createTestEditor('word');
+    setSelection(view, 0, 4);
+    wrapSelection(view, '`', '`');
+    expect(getDoc(view)).toBe('`word`');
+    wrapSelection(view, '`', '`');
+    expect(getDoc(view)).toBe('word');
     container.remove();
   });
 });
@@ -304,11 +369,13 @@ describe('Toggle: H1 button (prefixLine with "# ")', () => {
     container.remove();
   });
 
-  it('TOGGLE ON: adds # to a blank line', () => {
-    const { view, container } = createTestEditor('');
+  it('TOGGLE ON then OFF: press H1 twice toggles on then off', () => {
+    const { view, container } = createTestEditor('Title');
     setSelection(view, 0, 0);
     prefixLine(view, '# ');
-    expect(getDoc(view)).toBe('# ');
+    expect(getDoc(view)).toBe('# Title');
+    prefixLine(view, '# ');
+    expect(getDoc(view)).toBe('Title');
     container.remove();
   });
 
@@ -334,6 +401,16 @@ describe('Toggle: H2 button (prefixLine with "## ")', () => {
   it('TOGGLE OFF: removes ## prefix from a line', () => {
     const { view, container } = createTestEditor('## Subtitle');
     setSelection(view, 0, 0);
+    prefixLine(view, '## ');
+    expect(getDoc(view)).toBe('Subtitle');
+    container.remove();
+  });
+
+  it('TOGGLE ON then OFF: press H2 twice toggles on then off', () => {
+    const { view, container } = createTestEditor('Subtitle');
+    setSelection(view, 0, 0);
+    prefixLine(view, '## ');
+    expect(getDoc(view)).toBe('## Subtitle');
     prefixLine(view, '## ');
     expect(getDoc(view)).toBe('Subtitle');
     container.remove();
@@ -365,6 +442,16 @@ describe('Toggle: H3 button (prefixLine with "### ")', () => {
     container.remove();
   });
 
+  it('TOGGLE ON then OFF: press H3 twice toggles on then off', () => {
+    const { view, container } = createTestEditor('Section');
+    setSelection(view, 0, 0);
+    prefixLine(view, '### ');
+    expect(getDoc(view)).toBe('### Section');
+    prefixLine(view, '### ');
+    expect(getDoc(view)).toBe('Section');
+    container.remove();
+  });
+
   it('does not remove ## prefix when toggling ### (exact prefix match)', () => {
     const { view, container } = createTestEditor('## Section');
     setSelection(view, 0, 0);
@@ -391,11 +478,13 @@ describe('Toggle: Unordered list button (prefixLine with "- ")', () => {
     container.remove();
   });
 
-  it('TOGGLE ON: adds - to a blank line', () => {
-    const { view, container } = createTestEditor('');
+  it('TOGGLE ON then OFF: press UL twice toggles on then off', () => {
+    const { view, container } = createTestEditor('item');
     setSelection(view, 0, 0);
     prefixLine(view, '- ');
-    expect(getDoc(view)).toBe('- ');
+    expect(getDoc(view)).toBe('- item');
+    prefixLine(view, '- ');
+    expect(getDoc(view)).toBe('item');
     container.remove();
   });
 });
@@ -417,12 +506,20 @@ describe('Toggle: Ordered list button (prefixLine with "1. ")', () => {
     container.remove();
   });
 
+  it('TOGGLE ON then OFF: press OL twice toggles on then off', () => {
+    const { view, container } = createTestEditor('item');
+    setSelection(view, 0, 0);
+    prefixLine(view, '1. ');
+    expect(getDoc(view)).toBe('1. item');
+    prefixLine(view, '1. ');
+    expect(getDoc(view)).toBe('item');
+    container.remove();
+  });
+
   it('does not remove "10. " when toggling "1. " (exact prefix match)', () => {
     const { view, container } = createTestEditor('10. item');
     setSelection(view, 0, 0);
     prefixLine(view, '1. ');
-    // "10. " does not start with "1. " exactly — "1" is first char, "1." would be "1." not "10."
-    // Actually "10. " starts with "1" but not "1. " — so it adds
     expect(getDoc(view)).toBe('1. 10. item');
     container.remove();
   });
@@ -445,11 +542,13 @@ describe('Toggle: Blockquote button (prefixLine with "> ")', () => {
     container.remove();
   });
 
-  it('TOGGLE ON: adds > to a blank line', () => {
-    const { view, container } = createTestEditor('');
+  it('TOGGLE ON then OFF: press blockquote twice toggles on then off', () => {
+    const { view, container } = createTestEditor('quote text');
     setSelection(view, 0, 0);
     prefixLine(view, '> ');
-    expect(getDoc(view)).toBe('> ');
+    expect(getDoc(view)).toBe('> quote text');
+    prefixLine(view, '> ');
+    expect(getDoc(view)).toBe('quote text');
     container.remove();
   });
 });
@@ -490,12 +589,31 @@ describe('Toggle: Link button logic', () => {
     container.remove();
   });
 
-  it('TOGGLE OFF: applying link to already-linked text adds nested brackets', () => {
-    // Like wrapSelection, the link button does not unwrap — it always wraps
+  it('TOGGLE OFF: pressing link on [click here](url) (full selection) removes link', () => {
     const { view, container } = createTestEditor('[click here](url)');
-    setSelection(view, 1, 11); // select "click here"
+    setSelection(view, 0, 17); // select "[click here](url)"
     wrapSelection(view, '[', '](url)');
-    expect(getDoc(view)).toBe('[[click here](url)](url)');
+    expect(getDoc(view)).toBe('click here');
+    container.remove();
+  });
+
+  it('TOGGLE OFF: pressing link when selection is inside [text](url) removes link', () => {
+    const { view, container } = createTestEditor('[click here](url)');
+    setSelection(view, 1, 11); // select "click here" inside [...]
+    wrapSelection(view, '[', '](url)');
+    expect(getDoc(view)).toBe('click here');
+    container.remove();
+  });
+
+  it('TOGGLE ON then OFF: press link twice toggles on then off', () => {
+    const { view, container } = createTestEditor('click here');
+    setSelection(view, 0, 10);
+    wrapSelection(view, '[', '](url)');
+    expect(getDoc(view)).toBe('[click here](url)');
+    // Select the full link text including markers
+    setSelection(view, 0, 17);
+    wrapSelection(view, '[', '](url)');
+    expect(getDoc(view)).toBe('click here');
     container.remove();
   });
 });
@@ -554,14 +672,24 @@ describe('wrapSelection edge cases', () => {
     container.remove();
   });
 
-  it('can apply multiple wrap types sequentially', () => {
+  it('can apply bold then italic sequentially (nested formatting)', () => {
     const { view, container } = createTestEditor('word');
     setSelection(view, 0, 4);
     wrapSelection(view, '**', '**');
-    // Now select the bold text
-    setSelection(view, 2, 6); // "word" inside **...**
+    expect(getDoc(view)).toBe('**word**');
+    // Now select the bold text including markers
+    setSelection(view, 0, 8);
     wrapSelection(view, '*', '*');
     expect(getDoc(view)).toBe('***word***');
+    container.remove();
+  });
+
+  it('does not unwrap ***word*** with * because inner **word** is also wrapped with *', () => {
+    const { view, container } = createTestEditor('***word***');
+    setSelection(view, 0, 10); // select ***word***
+    wrapSelection(view, '*', '*');
+    // Guard prevents unwrapping: inner **word** starts/ends with *, so it wraps instead
+    expect(getDoc(view)).toBe('****word****');
     container.remove();
   });
 });
