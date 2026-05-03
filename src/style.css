@@ -103,21 +103,21 @@
   --syntax-function: #88c0d0;
 }
 
-[data-theme="dracula"] {
-  --bg: #282a36;
-  --surface: #44475a;
-  --surface-2: #6272a4;
-  --border: #6272a4;
-  --border-strong: #f8f8f2;
-  --text: #f8f8f2;
-  --text-2: #8be9fd;
-  --text-3: #6272a4;
-  --accent: #ff79c6;
-  --accent-soft: #44475a;
-  --syntax-keyword: #ff79c6;
-  --syntax-string: #f1fa8c;
-  --syntax-number: #bd93f9;
-  --syntax-function: #50fa7b;
+[data-theme="one-dark"] {
+  --bg: #282c34;
+  --surface: #30343c;
+  --surface-2: #3c4048;
+  --border: #4b5263;
+  --border-strong: #abb2bf;
+  --text: #abb2bf;
+  --text-2: #8792a2;
+  --text-3: #4b5263;
+  --accent: #61afef;
+  --accent-soft: #30343c;
+  --syntax-keyword: #c678dd;
+  --syntax-string: #98c379;
+  --syntax-number: #d19a66;
+  --syntax-function: #61afef;
 }
 
 [data-theme="github-light"] {
