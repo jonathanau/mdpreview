@@ -160,7 +160,7 @@ function updateStats(text) {
 // ─── Theme ────────────────────────────────────────────────────────────────
 
 function isThemeDark(theme) {
-  return ['solarized-dark', 'ember', 'monokai', 'nord', 'dracula'].includes(theme);
+  return ['solarized-dark', 'ember', 'monokai', 'nord', 'one-dark'].includes(theme);
 }
 
 function applyTheme() {
