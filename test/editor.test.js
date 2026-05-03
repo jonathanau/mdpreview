@@ -321,6 +321,50 @@ describe('Toggle: Inline code button (wrapSelection with `)', () => {
   });
 });
 
+describe('Toggle: Code block button (wrapSelection with ```)', () => {
+  it('TOGGLE ON: wraps selected text with triple backticks', () => {
+    const { view, container } = createTestEditor('code block');
+    setSelection(view, 0, 10);
+    wrapSelection(view, '```', '```');
+    expect(getDoc(view)).toBe('```code block```');
+    container.remove();
+  });
+
+  it('TOGGLE ON: inserts ```text``` placeholder when no selection', () => {
+    const { view, container } = createTestEditor('');
+    setSelection(view, 0, 0);
+    wrapSelection(view, '```', '```');
+    expect(getDoc(view)).toBe('```text```');
+    container.remove();
+  });
+
+  it('TOGGLE OFF: pressing code block on ```word``` (full selection) removes triple backticks', () => {
+    const { view, container } = createTestEditor('```word```');
+    setSelection(view, 0, 10);
+    wrapSelection(view, '```', '```');
+    expect(getDoc(view)).toBe('word');
+    container.remove();
+  });
+
+  it('TOGGLE OFF: pressing code block when selection is inside ```word``` removes triple backticks', () => {
+    const { view, container } = createTestEditor('```word```');
+    setSelection(view, 3, 7);
+    wrapSelection(view, '```', '```');
+    expect(getDoc(view)).toBe('word');
+    container.remove();
+  });
+
+  it('TOGGLE ON then OFF: press code block twice on plain text toggles formatting on then off', () => {
+    const { view, container } = createTestEditor('word');
+    setSelection(view, 0, 4);
+    wrapSelection(view, '```', '```');
+    expect(getDoc(view)).toBe('```word```');
+    wrapSelection(view, '```', '```');
+    expect(getDoc(view)).toBe('word');
+    container.remove();
+  });
+});
+
 // ─── prefixLine (headings, lists, blockquote) ────────────────────────────
 
 describe('prefixLine', () => {

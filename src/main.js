@@ -232,6 +232,7 @@ function setupToolbar() {
   on('tb-italic', () => wrapSelection(editorView, '*', '*'));
   on('tb-strike', () => wrapSelection(editorView, '~~', '~~'));
   on('tb-code', () => wrapSelection(editorView, '`', '`'));
+  on('tb-code-block', () => wrapSelection(editorView, '```', '```'));
   on('tb-h1', () => prefixLine(editorView, '# '));
   on('tb-h2', () => prefixLine(editorView, '## '));
   on('tb-h3', () => prefixLine(editorView, '### '));
