@@ -379,7 +379,7 @@ html, body {
   flex-direction: column;
   overflow: hidden;
   min-width: 0;
-  border-right: 1px solid var(--border);
+  border-right: none;
 }
 
 .pane-header {
@@ -428,7 +428,7 @@ html, body {
 #splitter {
   width: 4px;
   cursor: col-resize;
-  background: transparent;
+  background: var(--surface-2);
   flex-shrink: 0;
   transition: background 0.15s;
 }
