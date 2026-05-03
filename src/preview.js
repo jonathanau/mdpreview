@@ -51,11 +51,17 @@ export function setHljsTheme(themeName) {
 
 // ─── Render ────────────────────────────────────────────────────────────────
 
+DOMPurify.addHook('uponSanitizeElement', (node, data) => {
+  if (data.tagName === 'iframe') {
+    node.setAttribute('sandbox', '');
+  }
+});
+
 export function renderMarkdown(content) {
   if (!content.trim()) return '';
   const raw = marked.parse(content);
   return DOMPurify.sanitize(raw, {
     ADD_TAGS: ['iframe'],
-    ADD_ATTR: ['allow', 'allowfullscreen', 'frameborder', 'scrolling'],
+    ADD_ATTR: ['allow', 'allowfullscreen', 'frameborder', 'sandbox', 'scrolling'],
   });
 }

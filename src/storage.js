@@ -2,6 +2,14 @@ const DB_NAME = 'md-editor';
 const DB_VERSION = 1;
 const STORE = 'documents';
 
+function validateDoc(doc) {
+  if (!doc || typeof doc !== 'object') return null;
+  if (typeof doc.id !== 'string' || !doc.id.startsWith('doc-')) return null;
+  if (typeof doc.content !== 'string') doc.content = '';
+  if (typeof doc.updatedAt !== 'number' || !isFinite(doc.updatedAt)) doc.updatedAt = Date.now();
+  return doc;
+}
+
 function openDB() {
   return new Promise((resolve, reject) => {
     const req = indexedDB.open(DB_NAME, DB_VERSION);
@@ -47,13 +55,14 @@ export class Storage {
       const store = t.objectStore(STORE);
       const index = store.index('updatedAt');
       const req = index.getAll();
-      req.onsuccess = () => resolve(req.result.reverse());
+      req.onsuccess = () => resolve(req.result.map(validateDoc).filter(Boolean).reverse());
       req.onerror = () => reject(req.error);
     });
   }
 
   async get(id) {
-    return tx(this.db, 'readonly', (store) => store.get(id));
+    const doc = await tx(this.db, 'readonly', (store) => store.get(id));
+    return validateDoc(doc);
   }
 
   async save(doc) {
@@ -63,7 +72,7 @@ export class Storage {
 
   async create(title = 'Untitled') {
     const doc = {
-      id: `doc-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      id: `doc-${crypto.randomUUID()}`,
       title,
       content: '',
       updatedAt: Date.now(),

@@ -220,6 +220,7 @@ function setupToolbar() {
     a.href = URL.createObjectURL(blob);
     a.download = `${title.replace(/[^a-z0-9]/gi, '-').toLowerCase()}.md`;
     a.click();
+    URL.revokeObjectURL(a.href);
     showToast('Downloaded');
   });
 
@@ -242,6 +243,7 @@ function setupToolbar() {
     a.href = URL.createObjectURL(blob);
     a.download = `${title.replace(/[^a-z0-9]/gi, '-').toLowerCase()}.html`;
     a.click();
+    URL.revokeObjectURL(a.href);
     showToast('Downloaded');
   });
 
@@ -315,7 +317,7 @@ function showToast(msg) {
 }
 
 function escapeHtml(str) {
-  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
 function defaultContent() {
