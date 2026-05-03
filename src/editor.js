@@ -1,4 +1,4 @@
-import { EditorView, keymap, lineNumbers, highlightActiveLine, highlightActiveLineGutter, drawSelection } from '@codemirror/view';
+import { EditorView, keymap, lineNumbers, highlightActiveLineGutter, drawSelection } from '@codemirror/view';
 import { EditorState, Compartment } from '@codemirror/state';
 import { markdown, markdownLanguage } from '@codemirror/lang-markdown';
 import { defaultKeymap, history, historyKeymap, indentWithTab } from '@codemirror/commands';
@@ -28,7 +28,6 @@ const baseEditorTheme = {
   '&.cm-focused .cm-selectionBackground, .cm-selectionBackground': {
     backgroundColor: 'var(--accent-soft)',
   },
-  '.cm-activeLine': { backgroundColor: 'var(--surface-2)' },
   '.cm-gutters': { backgroundColor: 'var(--surface-2)', color: 'var(--text-3)' },
   '.cm-activeLineGutter': { backgroundColor: 'var(--border)', color: 'var(--text-2)' },
   '.cm-foldPlaceholder': { backgroundColor: 'var(--border)', border: 'none', color: 'var(--text-2)' },
@@ -80,7 +79,6 @@ export function createEditor({ container, doc = '', onChange, isDark = false }) 
       extensions: [
         history(),
         lineNumbers(),
-        highlightActiveLine(),
         highlightActiveLineGutter(),
         drawSelection(),
         bracketMatching(),
