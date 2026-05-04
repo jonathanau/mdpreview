@@ -628,6 +628,28 @@ html, body {
 #status span { display: flex; align-items: center; gap: 6px; }
 .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
 
+#stat-github {
+  margin-left: auto;
+  color: var(--text-3);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: color 0.1s;
+}
+
+#stat-github:hover {
+  color: var(--text);
+}
+
+#stat-github svg {
+  width: 13px;
+  height: 13px;
+  fill: currentColor;
+  stroke: none;
+  vertical-align: middle;
+}
+
 /* ─── Toast ──────────────────────────────────────────────────────────────── */
 
 #toast {
