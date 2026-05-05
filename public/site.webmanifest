@@ -1,0 +1,23 @@
+{
+  "name": "MDPreview",
+  "short_name": "MDPreview",
+  "description": "A browser Markdown editor with live preview and local document storage.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#fdf6e3",
+  "theme_color": "#fdf6e3",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

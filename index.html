@@ -4,11 +4,110 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:;" />
+  <meta name="description" content="MDPreview is a free browser-based Markdown editor with live preview, local document storage, syntax highlighting, themes, focus mode, and Markdown or HTML export." />
+  <meta name="keywords" content="markdown editor, live markdown preview, browser markdown editor, markdown to HTML, local markdown editor, CodeMirror markdown" />
+  <meta name="author" content="Jonathan Au" />
+  <meta name="application-name" content="MDPreview" />
+  <meta name="robots" content="index, follow, max-image-preview:large" />
+  <meta name="theme-color" content="#fdf6e3" />
+  <link rel="canonical" href="https://mdpreview.onrender.com/" />
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
   <link rel="stylesheet" href="/fonts/fonts.css" />
-  <title>MDPreview</title>
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="MDPreview" />
+  <meta property="og:title" content="MDPreview - Markdown Editor with Live Preview" />
+  <meta property="og:description" content="Write Markdown in your browser with instant preview, syntax highlighting, local storage, themes, focus mode, and export tools." />
+  <meta property="og:url" content="https://mdpreview.onrender.com/" />
+  <meta property="og:image" content="https://mdpreview.onrender.com/icon-192.png" />
+  <meta property="og:image:alt" content="MDPreview app icon" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="MDPreview - Markdown Editor with Live Preview" />
+  <meta name="twitter:description" content="A free browser Markdown editor with live preview, local storage, syntax highlighting, themes, focus mode, and export tools." />
+  <meta name="twitter:image" content="https://mdpreview.onrender.com/icon-192.png" />
+  <title>MDPreview - Markdown Editor with Live Preview</title>
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "@id": "https://mdpreview.onrender.com/#website",
+          "name": "MDPreview",
+          "url": "https://mdpreview.onrender.com/",
+          "description": "A browser-based Markdown editor with live preview and local document storage.",
+          "inLanguage": "en"
+        },
+        {
+          "@type": "SoftwareApplication",
+          "@id": "https://mdpreview.onrender.com/#app",
+          "name": "MDPreview",
+          "applicationCategory": "DeveloperApplication",
+          "operatingSystem": "Any",
+          "url": "https://mdpreview.onrender.com/",
+          "image": "https://mdpreview.onrender.com/icon-192.png",
+          "description": "MDPreview is a free browser-based Markdown editor with live preview, syntax highlighting, local IndexedDB document storage, multiple themes, focus mode, and Markdown or HTML export.",
+          "featureList": [
+            "Live Markdown preview",
+            "Browser-local document storage",
+            "Markdown syntax highlighting",
+            "Code block syntax highlighting",
+            "Multiple editor themes",
+            "Focus mode",
+            "Markdown download",
+            "Rendered HTML copy and download"
+          ],
+          "softwareRequirements": "Modern web browser",
+          "isAccessibleForFree": true,
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          },
+          "creator": {
+            "@type": "Person",
+            "name": "Jonathan Au",
+            "url": "https://github.com/jonathanau"
+          },
+          "sameAs": [
+            "https://github.com/jonathanau/mdpreview"
+          ]
+        },
+        {
+          "@type": "FAQPage",
+          "@id": "https://mdpreview.onrender.com/#faq",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "What is MDPreview?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "MDPreview is a browser-based Markdown editor that shows a live rendered preview while you write."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Does MDPreview require an account?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "No. MDPreview runs in the browser and stores documents locally using IndexedDB."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Can MDPreview export Markdown or HTML?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes. MDPreview can download Markdown files and copy or download rendered HTML."
+              }
+            }
+          ]
+        }
+      ]
+    }
+  </script>
   <script>
     (function() {
       const saved = localStorage.getItem('md-theme');

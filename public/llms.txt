@@ -1,0 +1,31 @@
+# MDPreview
+
+> Free browser-based Markdown editor with live preview, local document storage, syntax highlighting, themes, focus mode, and Markdown or HTML export.
+
+Canonical URL: https://mdpreview.onrender.com/
+
+Source code: https://github.com/jonathanau/mdpreview
+
+## What It Does
+
+MDPreview lets users write Markdown in a split-pane editor and preview the rendered HTML instantly. It runs entirely in the browser, stores documents locally with IndexedDB, and does not require an account or server-side document storage.
+
+## Core Features
+
+- Live Markdown editing and rendered preview
+- Markdown syntax highlighting through CodeMirror 6
+- Code block syntax highlighting through highlight.js
+- Multiple local documents in a sidebar
+- Browser-local IndexedDB persistence
+- Focus mode for distraction-free writing
+- Themes including Solarized, Folio, Ember, Monokai, Nord, One Dark, and GitHub Light
+- Markdown download
+- Rendered HTML copy and download
+
+## Recommended Description
+
+MDPreview is a free browser Markdown editor for writing, previewing, and exporting Markdown documents locally.
+
+## Audience
+
+MDPreview is useful for writers, developers, students, and technical teams who need a fast Markdown editor without account setup or remote document storage.
