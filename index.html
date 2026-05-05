@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:;" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://gc.zgo.at; connect-src 'self' https://mdpreview.goatcounter.com; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://mdpreview.goatcounter.com;" />
   <meta name="description" content="MDPreview is a free browser-based Markdown editor with live preview, local document storage, syntax highlighting, themes, focus mode, and Markdown or HTML export." />
   <meta name="keywords" content="markdown editor, live markdown preview, browser markdown editor, markdown to HTML, local markdown editor, CodeMirror markdown" />
   <meta name="author" content="Jonathan Au" />
@@ -28,6 +28,8 @@
   <meta name="twitter:description" content="A free browser Markdown editor with live preview, local storage, syntax highlighting, themes, focus mode, and export tools." />
   <meta name="twitter:image" content="https://mdpreview.onrender.com/icon-192.png" />
   <title>MDPreview - Markdown Editor with Live Preview</title>
+  <script data-goatcounter="https://mdpreview.goatcounter.com/count"
+          async src="//gc.zgo.at/count.js"></script>
   <script type="application/ld+json">
     {
       "@context": "https://schema.org",
