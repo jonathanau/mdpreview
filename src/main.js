@@ -15,6 +15,7 @@ const storage = new Storage();
 let editorView = null;
 let currentDoc = null;
 let saveTimer = null;
+let previewTimer = null;
 let currentTheme = 'solarized-light';
 let sidebarOpen = true;
 let sidebarWidth = 220; // Default width
@@ -33,7 +34,13 @@ const statSaved = document.getElementById('stat-saved');
 // ─── Init ─────────────────────────────────────────────────────────────────
 
 async function init() {
-  await storage.init();
+  try {
+    await storage.init();
+  } catch (err) {
+    console.error('Storage init failed:', err);
+    showToast('Failed to open document storage');
+    return;
+  }
 
   const savedTheme = localStorage.getItem('md-theme');
   if (savedTheme === 'light') currentTheme = 'folio';
@@ -61,17 +68,23 @@ async function init() {
     isDark: isThemeDark(currentTheme),
   });
 
-  let docs = await storage.list();
-  if (docs.length === 0) {
-    const doc = await storage.create('Welcome');
-    await storage.save({ ...doc, content: defaultContent() });
-    docs = await storage.list();
+  try {
+    let docs = await storage.list();
+    if (docs.length === 0) {
+      const doc = await storage.create('Welcome');
+      await storage.save({ ...doc, content: defaultContent() });
+      docs = await storage.list();
+    }
+    await openDoc(docs[0].id);
+  } catch (err) {
+    console.error('Failed to load documents:', err);
+    showToast('Failed to load documents');
   }
 
-  await openDoc(docs[0].id);
   renderSidebar();
   setupToolbar();
   setupSplitter();
+  setupSidebarKeyboard();
 
   document.documentElement.classList.remove('loading');
 }
@@ -83,16 +96,25 @@ async function openDoc(id) {
   if (saveTimer && currentDoc) {
     clearTimeout(saveTimer);
     saveTimer = null;
-    await storage.save(currentDoc);
-    statSaved.textContent = 'saved';
+    try {
+      await storage.save(currentDoc);
+      statSaved.textContent = 'saved';
+    } catch (err) {
+      console.error('Save failed during switch:', err);
+    }
   }
-  const doc = await storage.get(id);
-  if (!doc) return;
-  currentDoc = doc;
-  setEditorContent(editorView, doc.content);
-  renderPreview(doc.content);
-  updateStats(doc.content);
-  editorView.focus();
+  try {
+    const doc = await storage.get(id);
+    if (!doc) return;
+    currentDoc = doc;
+    setEditorContent(editorView, doc.content);
+    renderPreview(doc.content);
+    updateStats(doc.content);
+    editorView.focus();
+  } catch (err) {
+    console.error('Failed to open document:', err);
+    showToast('Failed to open document');
+  }
 }
 
 async function renderSidebar() {
@@ -109,9 +131,9 @@ async function renderSidebar() {
     el.innerHTML = `
       <div class="doc-item-inner">
         <span class="doc-title">${escapeHtml(title)}</span>
-        <span class="doc-time">${time}</span>
+        <span class="doc-time">${escapeHtml(time)}</span>
       </div>
-      <button class="doc-delete" title="Delete" data-id="${doc.id}">
+      <button class="doc-delete" title="Delete" aria-label="Delete ${escapeHtml(title)}" data-id="${doc.id}">
         <svg viewBox="0 0 24 24" width="12" height="12"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
       </button>
     `;
@@ -124,13 +146,19 @@ async function renderSidebar() {
     el.querySelector('.doc-delete').addEventListener('click', async (e) => {
       e.stopPropagation();
       if (docs.length === 1) { showToast('Cannot delete the last document'); return; }
-      if (!confirm('Delete this document?')) return;
-      await storage.delete(doc.id);
-      const remaining = await storage.list();
-      if (currentDoc && currentDoc.id === doc.id) {
-        await openDoc(remaining[0].id);
+      const confirmed = await showConfirm('Delete this document?');
+      if (!confirmed) return;
+      try {
+        await storage.delete(doc.id);
+        const remaining = await storage.list();
+        if (currentDoc && currentDoc.id === doc.id) {
+          await openDoc(remaining[0].id);
+        }
+        renderSidebar();
+      } catch (err) {
+        console.error('Delete failed:', err);
+        showToast('Failed to delete document');
       }
-      renderSidebar();
     });
 
     docList.appendChild(el);
@@ -140,7 +168,7 @@ async function renderSidebar() {
 function handleContentChange(content) {
   if (!currentDoc) return;
   currentDoc.content = content;
-  renderPreview(content);
+  schedulePreview(content);
   updateStats(content);
   statSaved.textContent = 'saving…';
   clearTimeout(saveTimer);
@@ -167,6 +195,11 @@ function renderPreview(content) {
   }
   previewEmpty.style.display = 'none';
   previewContent.innerHTML = renderMarkdown(content);
+}
+
+function schedulePreview(content) {
+  clearTimeout(previewTimer);
+  previewTimer = setTimeout(() => renderPreview(content), 150);
 }
 
 // ─── Stats ────────────────────────────────────────────────────────────────
@@ -230,10 +263,15 @@ function setupToolbar() {
   });
 
   on('btn-new', async () => {
-    const doc = await storage.create();
-    await storage.save({ ...doc, content: '' });
-    await openDoc(doc.id);
-    renderSidebar();
+    try {
+      const doc = await storage.create();
+      await storage.save({ ...doc, content: '' });
+      await openDoc(doc.id);
+      renderSidebar();
+    } catch (err) {
+      console.error('Failed to create document:', err);
+      showToast('Failed to create document');
+    }
   });
 
   // Theme switcher logic
@@ -244,6 +282,7 @@ function setupToolbar() {
 
   const closeThemeMenu = () => {
     themeSwitcher.classList.remove('open');
+    btnTheme?.setAttribute('aria-expanded', 'false');
     if (currentTheme !== originalTheme) {
       currentTheme = originalTheme;
       applyTheme();
@@ -257,7 +296,11 @@ function setupToolbar() {
       closeThemeMenu();
     } else {
       themeSwitcher.classList.add('open');
+      btnTheme?.setAttribute('aria-expanded', 'true');
       originalTheme = currentTheme;
+      // Focus the active (or first) option
+      const active = themeMenu.querySelector('.theme-option.active') || themeMenu.querySelector('.theme-option');
+      active?.focus();
     }
   });
 
@@ -291,6 +334,28 @@ function setupToolbar() {
   document.addEventListener('click', (e) => {
     if (!themeSwitcher?.contains(e.target)) {
       closeThemeMenu();
+    }
+  });
+
+  // Theme menu keyboard navigation
+  themeMenu?.addEventListener('keydown', (e) => {
+    const options = [...themeMenu.querySelectorAll('.theme-option')];
+    const current = document.activeElement;
+    const idx = options.indexOf(current);
+
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      const next = e.key === 'ArrowDown'
+        ? options[(idx + 1) % options.length]
+        : options[(idx - 1 + options.length) % options.length];
+      next?.focus();
+    } else if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      current?.click();
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      closeThemeMenu();
+      btnTheme?.focus();
     }
   });
 
@@ -444,6 +509,65 @@ function showToast(msg) {
 
 function escapeHtml(str) {
   return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+function showConfirm(message) {
+  return new Promise((resolve) => {
+    const dialog = document.getElementById('confirm-dialog');
+    const msg = document.getElementById('confirm-message');
+    const okBtn = document.getElementById('confirm-ok');
+    const cancelBtn = document.getElementById('confirm-cancel');
+
+    msg.textContent = message;
+
+    const cleanup = (result) => {
+      dialog.close();
+      okBtn.removeEventListener('click', onOk);
+      cancelBtn.removeEventListener('click', onCancel);
+      dialog.removeEventListener('cancel', onCancel);
+      resolve(result);
+    };
+
+    const onOk = () => cleanup(true);
+    const onCancel = () => cleanup(false);
+
+    okBtn.addEventListener('click', onOk);
+    cancelBtn.addEventListener('click', onCancel);
+    dialog.addEventListener('cancel', onCancel); // Escape key
+
+    dialog.showModal();
+    cancelBtn.focus();
+  });
+}
+
+function setupSidebarKeyboard() {
+  docList.addEventListener('keydown', (e) => {
+    const items = [...docList.querySelectorAll('.doc-item')];
+    if (items.length === 0) return;
+
+    const active = docList.querySelector('.doc-item.active');
+    const idx = items.indexOf(active);
+
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      const next = e.key === 'ArrowDown'
+        ? items[Math.min(idx + 1, items.length - 1)]
+        : items[Math.max(idx - 1, 0)];
+      if (next && next !== active) {
+        const id = next.dataset.id;
+        openDoc(id).then(renderSidebar);
+      }
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (active) active.click();
+    } else if (e.key === 'Delete' || e.key === 'Backspace') {
+      e.preventDefault();
+      if (active) {
+        const delBtn = active.querySelector('.doc-delete');
+        if (delBtn) delBtn.click();
+      }
+    }
+  });
 }
 
 function defaultContent() {

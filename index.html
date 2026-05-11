@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://gc.zgo.at; connect-src 'self' https://mdpreview.goatcounter.com; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://mdpreview.goatcounter.com;" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://gc.zgo.at; connect-src 'self' https://mdpreview.goatcounter.com; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://mdpreview.goatcounter.com;" />
   <meta name="description" content="MDPreview is a free browser-based Markdown editor with live preview, local document storage, syntax highlighting, themes, focus mode, and Markdown or HTML export." />
   <meta name="keywords" content="markdown editor, live markdown preview, browser markdown editor, markdown to HTML, local markdown editor, CodeMirror markdown" />
   <meta name="author" content="Jonathan Au" />
@@ -110,35 +110,23 @@
       ]
     }
   </script>
-  <script>
-    (function() {
-      const saved = localStorage.getItem('md-theme');
-      let theme = 'solarized-light';
-      if (saved === 'light') theme = 'folio';
-      else if (saved === 'dark') theme = 'ember';
-      else if (saved) theme = saved;
-      document.documentElement.setAttribute('data-theme', theme);
-    })();
-  </script>
-  <style>
-    html.loading body { visibility: hidden; }
-  </style>
+  <script src="/theme-init.js"></script>
 </head>
 <body>
   <div id="app">
 
-    <div id="toolbar">
-      <button class="tb-btn logo-btn" id="btn-sidebar" title="Toggle file panel">
+    <div id="toolbar" role="toolbar" aria-label="Formatting toolbar">
+      <button class="tb-btn logo-btn" id="btn-sidebar" title="Toggle file panel" aria-label="Toggle file panel">
         <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
       </button>
       <span class="toolbar-logo">MD<span>P</span>review</span>
       <div class="toolbar-divider"></div>
 
-      <button class="tb-btn" title="Bold (Ctrl+B)" id="tb-bold"><svg viewBox="0 0 24 24"><path d="M6 12h8a4 4 0 0 0 0-8H6v8z"/><path d="M6 12h9a4 4 0 0 1 0 8H6v-8z"/></svg></button>
-      <button class="tb-btn" title="Italic (Ctrl+I)" id="tb-italic"><svg viewBox="0 0 24 24"><line x1="19" y1="4" x2="10" y2="4"/><line x1="14" y1="20" x2="5" y2="20"/><line x1="15" y1="4" x2="9" y2="20"/></svg></button>
-      <button class="tb-btn" title="Strikethrough" id="tb-strike"><svg viewBox="0 0 24 24"><path d="M16 4H9a3 3 0 0 0-2.83 4"/><path d="M14 12a4 4 0 0 1 0 8H6"/><line x1="4" y1="12" x2="20" y2="12"/></svg></button>
-      <button class="tb-btn" title="Inline code" id="tb-code"><svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></button>
-      <button class="tb-btn" title="Code block" id="tb-codeblock">
+      <button class="tb-btn" title="Bold (Ctrl+B)" id="tb-bold" aria-label="Bold"><svg viewBox="0 0 24 24"><path d="M6 12h8a4 4 0 0 0 0-8H6v8z"/><path d="M6 12h9a4 4 0 0 1 0 8H6v-8z"/></svg></button>
+      <button class="tb-btn" title="Italic (Ctrl+I)" id="tb-italic" aria-label="Italic"><svg viewBox="0 0 24 24"><line x1="19" y1="4" x2="10" y2="4"/><line x1="14" y1="20" x2="5" y2="20"/><line x1="15" y1="4" x2="9" y2="20"/></svg></button>
+      <button class="tb-btn" title="Strikethrough" id="tb-strike" aria-label="Strikethrough"><svg viewBox="0 0 24 24"><path d="M16 4H9a3 3 0 0 0-2.83 4"/><path d="M14 12a4 4 0 0 1 0 8H6"/><line x1="4" y1="12" x2="20" y2="12"/></svg></button>
+      <button class="tb-btn" title="Inline code" id="tb-code" aria-label="Inline code"><svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></button>
+      <button class="tb-btn" title="Code block" id="tb-codeblock" aria-label="Code block">
         <svg viewBox="0 0 14 10" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" style="stroke-width: 1.4">
           <rect x="0" y="0" width="14" height="10" rx="1.5"/>
           <polyline points="1.5,3.2 3,5 1.5,6.8"/>
@@ -156,22 +144,22 @@
 
       <div class="toolbar-divider"></div>
 
-      <button class="tb-btn" title="Unordered list" id="tb-ul"><svg viewBox="0 0 24 24"><line x1="9" y1="6" x2="20" y2="6"/><line x1="9" y1="12" x2="20" y2="12"/><line x1="9" y1="18" x2="20" y2="18"/><circle cx="4" cy="6" r="1.2" fill="currentColor" stroke="none"/><circle cx="4" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="4" cy="18" r="1.2" fill="currentColor" stroke="none"/></svg></button>
-      <button class="tb-btn" title="Ordered list" id="tb-ol"><svg viewBox="0 0 24 24"><line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/><path d="M4 6h1v4"/><path d="M4 10h2"/><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></button>
-      <button class="tb-btn" title="Blockquote" id="tb-quote"><svg viewBox="0 0 24 24"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/></svg></button>
-      <button class="tb-btn" title="Link" id="tb-link"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
+      <button class="tb-btn" title="Unordered list" id="tb-ul" aria-label="Unordered list"><svg viewBox="0 0 24 24"><line x1="9" y1="6" x2="20" y2="6"/><line x1="9" y1="12" x2="20" y2="12"/><line x1="9" y1="18" x2="20" y2="18"/><circle cx="4" cy="6" r="1.2" fill="currentColor" stroke="none"/><circle cx="4" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="4" cy="18" r="1.2" fill="currentColor" stroke="none"/></svg></button>
+      <button class="tb-btn" title="Ordered list" id="tb-ol" aria-label="Ordered list"><svg viewBox="0 0 24 24"><line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/><path d="M4 6h1v4"/><path d="M4 10h2"/><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></button>
+      <button class="tb-btn" title="Blockquote" id="tb-quote" aria-label="Blockquote"><svg viewBox="0 0 24 24"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/></svg></button>
+      <button class="tb-btn" title="Link" id="tb-link" aria-label="Insert link"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
 
       <div id="toolbar-right">
-        <button class="tb-btn wide mobile-only" id="btn-preview-toggle" title="Toggle preview">
+        <button class="tb-btn wide mobile-only" id="btn-preview-toggle" title="Toggle preview" aria-label="Toggle preview">
           <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
           Preview
         </button>
-        <button class="tb-btn wide" id="btn-focus" title="Focus mode">
+        <button class="tb-btn wide" id="btn-focus" title="Focus mode" aria-label="Focus mode">
           <svg viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
           Focus
         </button>
         <div class="theme-switcher" id="theme-switcher">
-          <button class="tb-btn wide" title="Theme" id="btn-theme">
+          <button class="tb-btn wide" title="Theme" id="btn-theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false">
             <svg viewBox="0 0 24 24" width="14" height="14">
               <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/>
               <path d="M12 12 L12 3 A9 9 0 0 1 21 12 Z" fill="currentColor" stroke="none"/>
@@ -181,37 +169,37 @@
             </svg>
             <span>Theme</span>
           </button>
-          <div class="theme-menu" id="theme-menu">
-            <div class="theme-option" data-value="solarized-light">Solarized Light</div>
-            <div class="theme-option" data-value="solarized-dark">Solarized Dark</div>
-            <div class="theme-option" data-value="folio">Folio</div>
-            <div class="theme-option" data-value="ember">Ember</div>
-            <div class="theme-option" data-value="monokai">Monokai</div>
-            <div class="theme-option" data-value="nord">Nord</div>
-            <div class="theme-option" data-value="one-dark">One Dark</div>
-            <div class="theme-option" data-value="github-light">GitHub Light</div>
+          <div class="theme-menu" id="theme-menu" role="listbox" aria-label="Theme selection">
+            <div class="theme-option" data-value="solarized-light" role="option" tabindex="-1">Solarized Light</div>
+            <div class="theme-option" data-value="solarized-dark" role="option" tabindex="-1">Solarized Dark</div>
+            <div class="theme-option" data-value="folio" role="option" tabindex="-1">Folio</div>
+            <div class="theme-option" data-value="ember" role="option" tabindex="-1">Ember</div>
+            <div class="theme-option" data-value="monokai" role="option" tabindex="-1">Monokai</div>
+            <div class="theme-option" data-value="nord" role="option" tabindex="-1">Nord</div>
+            <div class="theme-option" data-value="one-dark" role="option" tabindex="-1">One Dark</div>
+            <div class="theme-option" data-value="github-light" role="option" tabindex="-1">GitHub Light</div>
           </div>
         </div>
       </div>
     </div>
 
     <div id="main">
-      <div id="sidebar">
+      <nav id="sidebar" role="navigation" aria-label="Documents">
         <div id="sidebar-header">
           <span class="sidebar-title">Files</span>
-          <button class="tb-btn" id="btn-new" title="New document">
+          <button class="tb-btn" id="btn-new" title="New document" aria-label="New document">
             <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           </button>
         </div>
-        <div id="doc-list"></div>
-      </div>
+        <div id="doc-list" role="listbox" aria-label="Document list" tabindex="0"></div>
+      </nav>
 
       <div id="sidebar-splitter" class="splitter"></div>
       <div id="editor-pane">
         <div class="pane-header">editor
           <div class="pane-actions">
-            <button class="tb-btn" title="Copy Markdown" id="btn-copy-md"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
-            <button class="tb-btn" title="Download .md" id="btn-download-md"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+            <button class="tb-btn" title="Copy Markdown" id="btn-copy-md" aria-label="Copy Markdown"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+            <button class="tb-btn" title="Download .md" id="btn-download-md" aria-label="Download Markdown"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
           </div>
         </div>
         <div id="editor-mount"></div>
@@ -222,8 +210,8 @@
       <div id="preview-pane">
         <div class="pane-header">preview
           <div class="pane-actions">
-            <button class="tb-btn" title="Copy HTML" id="btn-copy-html"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
-            <button class="tb-btn" title="Download .html" id="btn-download-html"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+            <button class="tb-btn" title="Copy HTML" id="btn-copy-html" aria-label="Copy HTML"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+            <button class="tb-btn" title="Download .html" id="btn-download-html" aria-label="Download HTML"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
           </div>
         </div>
         <div id="preview">
@@ -247,6 +235,21 @@
   </div>
 
   <div id="toast" role="status" aria-live="polite"></div>
+
+  <dialog id="confirm-dialog" class="confirm-dialog">
+    <p id="confirm-message">Are you sure?</p>
+    <div class="confirm-actions">
+      <button id="confirm-cancel" class="confirm-btn">Cancel</button>
+      <button id="confirm-ok" class="confirm-btn confirm-btn-danger">Delete</button>
+    </div>
+  </dialog>
+
+  <noscript>
+    <div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;color:#657b83;text-align:center;padding:2rem;">
+      <p>MDPreview requires JavaScript to run. Please enable JavaScript in your browser settings.</p>
+    </div>
+  </noscript>
+
   <script type="module" src="/src/main.js"></script>
 </body>
 </html>

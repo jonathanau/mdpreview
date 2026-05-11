@@ -93,6 +93,7 @@ export function extractTitle(content) {
 
 export function relativeTime(ts) {
   const diff = Date.now() - ts;
+  if (diff < 0) return 'just now';
   const min = Math.floor(diff / 60000);
   if (min < 1) return 'just now';
   if (min < 60) return `${min}m ago`;
