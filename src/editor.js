@@ -200,6 +200,7 @@ export function prefixLine(view, prefix) {
   } else {
     view.dispatch({
       changes: { from: line.from, to: line.from, insert: prefix },
+      selection: { anchor: line.from + prefix.length },
     });
   }
   view.focus();
@@ -224,11 +225,13 @@ export function toggleHeading(view, level) {
     } else {
       view.dispatch({
         changes: { from: line.from, to: line.from + headingMatch[0].length, insert: targetPrefix },
+        selection: { anchor: line.from + targetPrefix.length },
       });
     }
   } else {
     view.dispatch({
       changes: { from: line.from, to: line.from, insert: targetPrefix },
+      selection: { anchor: line.from + targetPrefix.length },
     });
   }
   view.focus();

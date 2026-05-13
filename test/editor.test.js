@@ -371,6 +371,38 @@ describe('prefixLine', () => {
     expect(getDoc(view)).toBe('line1\n- line2\nline3');
     container.remove();
   });
+
+  it('places cursor after the prefix on empty line when toggling ON', () => {
+    const { view, container } = createTestEditor('');
+    setSelection(view, 0, 0);
+    prefixLine(view, '- ');
+    expect(view.state.selection.main.anchor).toBe(2);
+    container.remove();
+  });
+
+  it('places cursor after the prefix when cursor is at line start', () => {
+    const { view, container } = createTestEditor('hello');
+    setSelection(view, 0, 0);
+    prefixLine(view, '- ');
+    expect(view.state.selection.main.anchor).toBe(2);
+    container.remove();
+  });
+
+  it('places cursor after a longer prefix like "1. " on empty line', () => {
+    const { view, container } = createTestEditor('');
+    setSelection(view, 0, 0);
+    prefixLine(view, '1. ');
+    expect(view.state.selection.main.anchor).toBe(3);
+    container.remove();
+  });
+
+  it('places cursor after "> " prefix on empty line', () => {
+    const { view, container } = createTestEditor('');
+    setSelection(view, 0, 0);
+    prefixLine(view, '> ');
+    expect(view.state.selection.main.anchor).toBe(2);
+    container.remove();
+  });
 });
 
 
@@ -459,6 +491,48 @@ describe('Toggle: H3 button (toggleHeading with level 3)', () => {
     setSelection(view, 0, 0);
     toggleHeading(view, 1);
     expect(getDoc(view)).toBe('# Section');
+    container.remove();
+  });
+});
+
+describe('toggleHeading cursor position', () => {
+  it('places cursor after "# " on empty line when toggling H1 ON', () => {
+    const { view, container } = createTestEditor('');
+    setSelection(view, 0, 0);
+    toggleHeading(view, 1);
+    expect(view.state.selection.main.anchor).toBe(2);
+    container.remove();
+  });
+
+  it('places cursor after "## " on empty line when toggling H2 ON', () => {
+    const { view, container } = createTestEditor('');
+    setSelection(view, 0, 0);
+    toggleHeading(view, 2);
+    expect(view.state.selection.main.anchor).toBe(3);
+    container.remove();
+  });
+
+  it('places cursor after "# " when cursor at line start on non-empty line', () => {
+    const { view, container } = createTestEditor('Title');
+    setSelection(view, 0, 0);
+    toggleHeading(view, 1);
+    expect(view.state.selection.main.anchor).toBe(2);
+    container.remove();
+  });
+
+  it('places cursor after "## " when upgrading from H1 to H2', () => {
+    const { view, container } = createTestEditor('# Title');
+    setSelection(view, 0, 0);
+    toggleHeading(view, 2);
+    expect(view.state.selection.main.anchor).toBe(3);
+    container.remove();
+  });
+
+  it('places cursor after "# " when downgrading from H2 to H1', () => {
+    const { view, container } = createTestEditor('## Title');
+    setSelection(view, 0, 0);
+    toggleHeading(view, 1);
+    expect(view.state.selection.main.anchor).toBe(2);
     container.remove();
   });
 });
