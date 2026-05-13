@@ -4,17 +4,6 @@
 
 **MDPreview** is a free, privacy-first browser-based Markdown editor with live preview. Write with syntax-highlighted code blocks and local document storage — all without a server, account, or signup. No data ever leaves your device.
 
----
-
-## Screenshots
-
-<!-- TODO: Add screenshots/GIF demo
-![MDPreview Editor](screenshots/editor.png)
-![MDPreview Live Preview](screenshots/preview.png)
--->
-
----
-
 ## Features
 
 - **Live split-pane editing** — CodeMirror 6 editor with instant Markdown preview
@@ -69,32 +58,6 @@ npm run preview
 npm test
 ```
 
-## Project Structure
-
-```
-├── index.html              # Application shell (SEO metadata, JSON-LD, semantic HTML)
-├── scripts/
-│   └── seo-pages.js        # Build-time landing page generator + sitemap plugin
-├── public/
-│   ├── llms.txt            # LLM/AI crawler optimization
-│   ├── robots.txt          # Crawler directives
-│   ├── sitemap.xml         # XML sitemap (auto-generated in production build)
-│   ├── theme-init.js       # Synchronous theme initialization
-│   └── fonts/              # Self-hosted web fonts
-├── src/
-│   ├── main.js             # App state, document management, UI wiring
-│   ├── editor.js           # CodeMirror 6 setup, themes, and formatting helpers
-│   ├── preview.js          # Markdown rendering and highlight.js theme loading
-│   ├── storage.js          # IndexedDB document store
-│   └── style.css           # Theme variables and layout styles
-├── test/
-│   ├── setup.js            # jsdom mocks for CodeMirror
-│   ├── editor.test.js
-│   ├── preview.test.js
-│   └── storage.test.js
-└── vite.config.js          # Vite configuration with SEO plugin
-```
-
 ## Frequently Asked Questions
 
 ### Does MDPreview work offline?
@@ -114,28 +77,6 @@ Yes. MDPreview supports GFM including tables, task lists, code fences with synta
 
 ### How do I save my documents?
 Saving is automatic. MDPreview auto-saves to IndexedDB as you type — no save button needed.
-
-## Recommended GitHub Topics
-
-When publishing or searching for this project, the following topics are recommended:
-
-```
-markdown, markdown-editor, markdown-preview, javascript, codemirror, vite, browser-based, offline-first, privacy-first, no-server, static-site
-```
-
-## Screenshot & Demo Recommendations
-
-For best results in search and documentation:
-
-1. **Editor screenshot** — Show the split-pane layout with Markdown on the left and rendered preview on the right
-2. **Theme showcase** — Same document displayed across multiple themes
-3. **Mobile view** — Responsive layout on a phone-sized viewport
-4. **Animated GIF** — Typing Markdown and watching the preview update in real time
-
-Tools for capture:
-- [Kap](https://getkap.co/) — Open-source screen recorder (macOS)
-- [CleanShot X](https://cleanshot.com/) — Screenshots and GIFs (macOS)
-- [ShareX](https://getsharex.com/) — Screenshots and screen recording (Windows)
 
 ## License
 
