@@ -8,10 +8,10 @@ A minimal, elegant markdown editor with live preview that runs entirely in your 
 - **Syntax highlighting** — Markdown in the editor, code blocks in the preview via highlight.js
 - **Multi-document** — Create, switch, rename, and delete files from the sidebar
 - **IndexedDB persistence** — All documents survive page refreshes
-- **8 color themes** — Solarized Light/Dark, Folio, Ember, Monokai, Nord, Dracula, GitHub Light
+- **8 color themes** — Solarized Light/Dark, Folio, Ember, Monokai, Nord, One Dark, GitHub Light
 - **Focus mode** — Hide everything except the editor for distraction-free writing
 - **Draggable splitter** — Resize the editor and preview panes to your preference
-- **Export options** — Download as `.md` or copy rendered HTML to the clipboard
+- **Export options** — Download as `.md`, copy Markdown source, or copy/download rendered HTML
 - **Formatting toolbar** — Bold, italic, headings, lists, blockquotes, links, and code blocks
 - **Status bar** — Live word, character, and line counts with auto-save indicator
 

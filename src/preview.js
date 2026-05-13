@@ -44,6 +44,7 @@ export function setHljsTheme(themeName) {
   if (!hljsLink) {
     hljsLink = document.createElement('link');
     hljsLink.rel = 'stylesheet';
+    hljsLink.dataset.hljs = '';
     document.head.appendChild(hljsLink);
   }
   hljsLink.href = hljsThemes[themeName] || githubCssUrl;

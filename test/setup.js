@@ -1,3 +1,4 @@
+import 'fake-indexeddb/auto';
 import { vi } from 'vitest';
 
 // Minimal DOM mocks needed for CodeMirror in jsdom

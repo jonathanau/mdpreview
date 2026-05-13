@@ -70,10 +70,9 @@ export class Storage {
     return tx(this.db, 'readwrite', (store) => store.put(doc));
   }
 
-  async create(title = 'Untitled') {
+  async create() {
     const doc = {
       id: `doc-${crypto.randomUUID()}`,
-      title,
       content: '',
       updatedAt: Date.now(),
     };

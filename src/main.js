@@ -6,6 +6,7 @@ import {
   setEditorContent,
   wrapSelection,
   prefixLine,
+  toggleHeading,
 } from './editor.js';
 import { renderMarkdown, setHljsTheme } from './preview.js';
 
@@ -42,14 +43,7 @@ async function init() {
     return;
   }
 
-  const savedTheme = localStorage.getItem('md-theme');
-  if (savedTheme === 'light') currentTheme = 'folio';
-  else if (savedTheme === 'dark') currentTheme = 'ember';
-  else if (savedTheme) {
-    currentTheme = savedTheme;
-  } else {
-    currentTheme = 'solarized-light';
-  }
+  currentTheme = localStorage.getItem('md-theme') || 'solarized-light';
   applyTheme();
 
   const savedSidebar = localStorage.getItem('md-sidebar');
@@ -71,7 +65,7 @@ async function init() {
   try {
     let docs = await storage.list();
     if (docs.length === 0) {
-      const doc = await storage.create('Welcome');
+      const doc = await storage.create();
       await storage.save({ ...doc, content: defaultContent() });
       docs = await storage.list();
     }
@@ -92,7 +86,6 @@ async function init() {
 // ─── Document management ──────────────────────────────────────────────────
 
 async function openDoc(id) {
-  // Flush any pending save for the current document before switching
   if (saveTimer && currentDoc) {
     clearTimeout(saveTimer);
     saveTimer = null;
@@ -176,7 +169,7 @@ function handleContentChange(content) {
     try {
       await storage.save(currentDoc);
       statSaved.textContent = 'saved';
-      renderSidebar();
+      await renderSidebar();
     } catch (err) {
       console.error('Save failed:', err);
       statSaved.textContent = 'save failed';
@@ -393,8 +386,21 @@ function setupToolbar() {
   on('btn-download-html', () => {
     const content = editorView.state.doc.toString();
     const title = extractTitle(content) || 'document';
-    const html = renderMarkdown(content);
-    const blob = new Blob([html], { type: 'text/html' });
+    const bodyHtml = renderMarkdown(content);
+    const hljsCss = document.querySelector('link[data-hljs]')?.href || '';
+    const docHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${escapeHtml(title)}</title>
+${hljsCss ? `<link rel="stylesheet" href="${hljsCss}">` : ''}
+</head>
+<body>
+${bodyHtml}
+</body>
+</html>`;
+    const blob = new Blob([docHtml], { type: 'text/html' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = `${title.replace(/[^a-z0-9]/gi, '-').toLowerCase()}.html`;
@@ -409,9 +415,9 @@ function setupToolbar() {
   on('tb-code', () => wrapSelection(editorView, '`', '`'));
   on('tb-codeblock', () => wrapSelection(editorView, '```\n', '\n```'));
 
-  on('tb-h1', () => prefixLine(editorView, '# '));
-  on('tb-h2', () => prefixLine(editorView, '## '));
-  on('tb-h3', () => prefixLine(editorView, '### '));
+  on('tb-h1', () => toggleHeading(editorView, 1));
+  on('tb-h2', () => toggleHeading(editorView, 2));
+  on('tb-h3', () => toggleHeading(editorView, 3));
   on('tb-ul', () => prefixLine(editorView, '- '));
   on('tb-ol', () => prefixLine(editorView, '1. '));
   on('tb-quote', () => prefixLine(editorView, '> '));
@@ -435,67 +441,60 @@ function setupToolbar() {
 
 function setupSplitter() {
   const main = document.getElementById('main');
-
-  // Sidebar splitter
   const sidebarSplitter = document.getElementById('sidebar-splitter');
-  const sidebar = document.getElementById('sidebar');
-  let sidebarDragging = false;
-
-  sidebarSplitter.addEventListener('mousedown', (e) => {
-    sidebarDragging = true;
-    sidebarSplitter.classList.add('dragging');
-    document.body.style.cursor = 'col-resize';
-    document.body.style.userSelect = 'none';
-  });
-
-  // Main splitter (Editor/Preview)
   const mainSplitter = document.getElementById('main-splitter');
+  const sidebar = document.getElementById('sidebar');
   const editorPane = document.getElementById('editor-pane');
   const previewPane = document.getElementById('preview-pane');
-  let mainDragging = false, startX = 0, startW = 0;
+  let sidebarDragging = false;
+  let mainDragging = false;
 
-  mainSplitter.addEventListener('mousedown', (e) => {
-    mainDragging = true;
-    startX = e.clientX;
-    startW = editorPane.getBoundingClientRect().width;
-    mainSplitter.classList.add('dragging');
+  const clientX = (e) => e.touches ? e.touches[0].clientX : e.clientX;
+  const startDrag = (splitter) => {
+    splitter.classList.add('dragging');
     document.body.style.cursor = 'col-resize';
     document.body.style.userSelect = 'none';
-  });
+  };
+  const endDrag = () => {
+    sidebarDragging = false;
+    mainDragging = false;
+    sidebarSplitter.classList.remove('dragging');
+    mainSplitter.classList.remove('dragging');
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
+  };
 
-  document.addEventListener('mousemove', (e) => {
+  sidebarSplitter.addEventListener('mousedown', () => { sidebarDragging = true; startDrag(sidebarSplitter); });
+  sidebarSplitter.addEventListener('touchstart', (e) => { e.preventDefault(); sidebarDragging = true; startDrag(sidebarSplitter); }, { passive: false });
+
+  mainSplitter.addEventListener('mousedown', () => { mainDragging = true; startDrag(mainSplitter); });
+  mainSplitter.addEventListener('touchstart', (e) => { e.preventDefault(); mainDragging = true; startDrag(mainSplitter); }, { passive: false });
+
+  const onMove = (e) => {
+    const cx = clientX(e);
     if (sidebarDragging) {
       const mainRect = main.getBoundingClientRect();
-      const newW = Math.max(160, Math.min(450, e.clientX - mainRect.left));
+      const newW = Math.max(160, Math.min(450, cx - mainRect.left));
       sidebarWidth = newW;
       sidebar.style.width = `${newW}px`;
       localStorage.setItem('md-sidebar-width', newW);
     }
-
     if (mainDragging) {
       const total = main.getBoundingClientRect().width;
       const sidebarW = sidebarOpen ? sidebar.getBoundingClientRect().width : 0;
-      const availableWidth = total - (sidebarOpen ? sidebarW + 4 : 0) - 4; // subtract splitters
-
+      const availableWidth = total - (sidebarOpen ? sidebarW + 4 : 0) - 4;
       const mainRect = main.getBoundingClientRect();
-      const relativeX = e.clientX - mainRect.left - (sidebarOpen ? sidebarW + 4 : 0);
-
+      const relativeX = cx - mainRect.left - (sidebarOpen ? sidebarW + 4 : 0);
       const newW = Math.max(200, Math.min(availableWidth - 200, relativeX));
       editorPane.style.flex = `0 0 ${((newW / availableWidth) * 100).toFixed(2)}%`;
       previewPane.style.flex = '1';
     }
-  });
+  };
 
-  document.addEventListener('mouseup', () => {
-    if (sidebarDragging || mainDragging) {
-      sidebarDragging = false;
-      mainDragging = false;
-      sidebarSplitter.classList.remove('dragging');
-      mainSplitter.classList.remove('dragging');
-      document.body.style.cursor = '';
-      document.body.style.userSelect = '';
-    }
-  });
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('touchmove', onMove, { passive: false });
+  document.addEventListener('mouseup', endDrag);
+  document.addEventListener('touchend', endDrag);
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────

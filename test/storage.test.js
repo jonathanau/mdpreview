@@ -1,5 +1,95 @@
-import { describe, it, expect } from 'vitest';
-import { extractTitle, relativeTime } from '../src/storage.js';
+import { describe, it, expect, beforeEach } from 'vitest';
+import { Storage, extractTitle, relativeTime } from '../src/storage.js';
+
+// ─── Storage class ─────────────────────────────────────────────────────────
+
+describe('Storage', () => {
+  let storage;
+
+  beforeEach(async () => {
+    if (storage?.db) storage.db.close();
+    await new Promise((resolve, reject) => {
+      const req = indexedDB.deleteDatabase('md-editor');
+      req.onsuccess = () => resolve();
+      req.onerror = () => reject(req.error);
+    });
+    storage = new Storage();
+    await storage.init();
+  });
+
+  it('init() creates a storage instance with a db connection', () => {
+    expect(storage.db).toBeTruthy();
+  });
+
+  it('create() returns a doc with id, content, and updatedAt (no title)', async () => {
+    const doc = await storage.create();
+    expect(doc.id).toMatch(/^doc-/);
+    expect(doc.content).toBe('');
+    expect(doc.updatedAt).toEqual(expect.any(Number));
+    expect(doc).not.toHaveProperty('title');
+  });
+
+  it('save() persists a document that can be retrieved with get()', async () => {
+    const doc = await storage.create();
+    doc.content = '# Hello';
+    await storage.save(doc);
+    const retrieved = await storage.get(doc.id);
+    expect(retrieved.content).toBe('# Hello');
+    expect(retrieved.id).toBe(doc.id);
+  });
+
+  it('save() updates updatedAt timestamp', async () => {
+    const doc = await storage.create();
+    const original = doc.updatedAt;
+    doc.content = 'updated';
+    await storage.save(doc);
+    expect(doc.updatedAt).toBeGreaterThanOrEqual(original);
+  });
+
+  it('get() returns null for nonexistent id', async () => {
+    const result = await storage.get('doc-nonexistent');
+    expect(result).toBeNull();
+  });
+
+  it('list() returns empty array when no documents exist', async () => {
+    const docs = await storage.list();
+    expect(docs).toEqual([]);
+  });
+
+  it('list() returns all documents ordered by updatedAt descending', async () => {
+    const doc1 = await storage.create();
+    doc1.content = 'older';
+    await storage.save(doc1);
+    const doc2 = await storage.create();
+    doc2.content = 'newer';
+    await storage.save(doc2);
+
+    const docs = await storage.list();
+    expect(docs).toHaveLength(2);
+    expect(docs[0].updatedAt).toBeGreaterThanOrEqual(docs[1].updatedAt);
+  });
+
+  it('delete() removes a document', async () => {
+    const doc = await storage.create();
+    await storage.delete(doc.id);
+    expect(await storage.get(doc.id)).toBeNull();
+  });
+
+  it('delete() on nonexistent id does not throw', async () => {
+    await expect(storage.delete('doc-nonexistent')).resolves.toBeUndefined();
+  });
+
+  it('full round-trip: create, save (update content), get, delete', async () => {
+    const doc = await storage.create();
+    expect(doc.content).toBe('');
+    doc.content = '# Final';
+    await storage.save(doc);
+    const retrieved = await storage.get(doc.id);
+    expect(retrieved.content).toBe('# Final');
+    await storage.delete(doc.id);
+    expect(await storage.get(doc.id)).toBeNull();
+  });
+});
 
 // ─── extractTitle ─────────────────────────────────────────────────────────
 
