@@ -1,4 +1,5 @@
 import { defineConfig } from 'vite';
+import { seoPlugin } from './scripts/seo-pages.js';
 
 export default defineConfig({
   base: '/',
@@ -6,9 +7,10 @@ export default defineConfig({
     outDir: 'dist',
     assetsDir: 'assets',
   },
+  plugins: [seoPlugin()],
   test: {
     environment: 'jsdom',
     globals: true,
-  setupFiles: ['./test/setup.js'],
+    setupFiles: ['./test/setup.js'],
   },
 });

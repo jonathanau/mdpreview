@@ -1,4 +1,7 @@
+# MDPreview robots.txt
 User-agent: *
 Allow: /
+Disallow: /fonts/
+Disallow: /assets/
 
 Sitemap: https://mdpreview.onrender.com/sitemap.xml

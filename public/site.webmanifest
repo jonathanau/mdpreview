@@ -1,12 +1,13 @@
 {
-  "name": "MDPreview",
+  "name": "MDPreview - Free Browser-Based Markdown Editor",
   "short_name": "MDPreview",
-  "description": "A browser Markdown editor with live preview and local document storage.",
+  "description": "A free browser-based Markdown editor with live preview, syntax highlighting, local document storage, multiple themes, and Markdown or HTML export.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "background_color": "#fdf6e3",
   "theme_color": "#fdf6e3",
+  "categories": ["developer-tools", "productivity", "utilities"],
   "icons": [
     {
       "src": "/icon-192.png",

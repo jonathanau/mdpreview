@@ -572,17 +572,23 @@ function setupSidebarKeyboard() {
 function defaultContent() {
   return `# Welcome to MDPreview
 
-A minimal, elegant writing environment. Your documents are stored locally in your browser using IndexedDB; no server required.
+**MDPreview** is a free browser-based Markdown editor and developer toolbox. Your documents are stored locally in your browser using IndexedDB — no server, no account, no data upload required.
+
+---
 
 ## Features
 
-- **CodeMirror 6** editor with Markdown syntax highlighting
-- **Live preview** with code syntax highlighting via highlight.js
-- **Multi-document** support — create, switch, and delete files from the sidebar
-- **IndexedDB** persistence — documents survive page refreshes
-- **Drag** the center divider to resize editor and preview panes
-- **Focus mode** — hide everything but the editor
-- **Dark mode** with system preference detection
+- [x] **CodeMirror 6** editor with Markdown syntax highlighting
+- [x] **Live preview** with code syntax highlighting via highlight.js
+- [x] **Multi-document** support — create, switch, and delete files from the sidebar
+- [x] **IndexedDB** persistence — documents survive page refreshes
+- [x] **Drag** the center divider to resize editor and preview panes
+- [x] **Focus mode** — hide everything but the editor
+- [x] **8 color themes** — Solarized, Monokai, Nord, and more
+- [x] **Privacy-first** — nothing leaves your browser
+- [x] **Works offline** — no network required after load
+
+---
 
 ## Quick Reference
 
@@ -590,21 +596,177 @@ A minimal, elegant writing environment. Your documents are stored locally in you
 |--------|--------|----------|
 | Bold | \`**text**\` | Ctrl+B |
 | Italic | \`*text*\` | Ctrl+I |
-| Heading | \`# H1\` | toolbar |
+| Strikethrough | \`~~text~~\` | toolbar |
+| Heading 1 | \`# H1\` | toolbar |
+| Heading 2 | \`## H2\` | toolbar |
+| Heading 3 | \`### H3\` | toolbar |
 | Link | \`[text](url)\` | toolbar |
-
-## Code Blocks
-
-\`\`\`javascript
-const greet = (name) => \`Hello, \${name}!\`;
-console.log(greet('world'));
-\`\`\`
-
-> Writing is thinking. To write well is to think clearly.
+| Inline Code | \`\`code\`\` | toolbar |
+| Code Block | \`\`\`lang ... \`\`\` | toolbar |
+| Unordered List | \`- item\` | toolbar |
+| Ordered List | \`1. item\` | toolbar |
+| Blockquote | \`> quote\` | toolbar |
 
 ---
 
-*Create a new document using the + button in the sidebar.*
+## Code Blocks
+
+### JavaScript
+
+\`\`\`javascript
+function fibonacci(n) {
+  if (n <= 1) return n;
+  return fibonacci(n - 1) + fibonacci(n - 2);
+}
+
+const seq = Array.from({ length: 10 }, (_, i) => fibonacci(i));
+console.log('Fibonacci sequence:', seq);
+// [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
+\`\`\`
+
+### Python
+
+\`\`\`python
+def quicksort(arr):
+    if len(arr) <= 1:
+        return arr
+    pivot = arr[len(arr) // 2]
+    left = [x for x in arr if x < pivot]
+    middle = [x for x in arr if x == pivot]
+    right = [x for x in arr if x > pivot]
+    return quicksort(left) + middle + quicksort(right)
+
+print(quicksort([3, 6, 8, 10, 1, 2, 1]))
+\`\`\`
+
+### SQL
+
+\`\`\`sql
+SELECT
+  u.name,
+  u.email,
+  COUNT(o.id) AS order_count,
+  SUM(o.total) AS total_spent
+FROM users u
+LEFT JOIN orders o ON u.id = o.user_id
+WHERE u.created_at >= '2025-01-01'
+GROUP BY u.id, u.name, u.email
+HAVING COUNT(o.id) > 0
+ORDER BY total_spent DESC
+LIMIT 10;
+\`\`\`
+
+### JSON
+
+\`\`\`json
+{
+  "project": "MDPreview",
+  "version": "1.0.0",
+  "features": [
+    "markdown-editing",
+    "live-preview",
+    "syntax-highlighting",
+    "local-storage"
+  ],
+  "license": "MIT",
+  "tags": {
+    "type": "developer-tool",
+    "platform": "browser",
+    "privacy": "offline-first"
+  }
+}
+\`\`\`
+
+---
+
+## Blockquote
+
+> Writing is thinking. To write well is to think clearly.
+>
+> — Attributed to many
+
+> The best way to predict the future is to invent it.
+>
+> — Alan Kay
+
+---
+
+## Task Lists
+
+- [x] Implement Markdown editor with live preview
+- [x] Add local IndexedDB storage
+- [x] Support multiple documents
+- [ ] Add table editing UI
+- [ ] Add image drag-and-drop
+- [ ] Add collaboration features
+
+---
+
+## Tables
+
+### Feature Comparison
+
+| Feature | MDPreview | Other Tools |
+|---------|-----------|-------------|
+| Browser-based | Yes | Varies |
+| Offline-capable | Yes | Rare |
+| Local storage | Yes | Varies |
+| No account needed | Yes | Rare |
+| Open source | Yes | Varies |
+| Privacy-first | Yes | Rare |
+| Cost | Free | Often paid |
+
+### Language Support
+
+| Language | Editor Highlighting | Preview Highlighting |
+|----------|-------------------|---------------------|
+| JavaScript | Yes | Yes |
+| Python | Yes | Yes |
+| TypeScript | Yes | Yes |
+| Go | Yes | Yes |
+| Rust | Yes | Yes |
+| SQL | Yes | Yes |
+| HTML/CSS | Yes | Yes |
+| JSON/YAML | Yes | Yes |
+
+---
+
+## LaTeX (if supported by your renderer)
+
+Inline: $E = mc^2$
+
+Block:
+
+$$
+\\sum_{i=1}^{n} i = \\frac{n(n+1)}{2}
+$$
+
+---
+
+## Links
+
+- [MDPreview on GitHub](https://github.com/jonathanau/mdpreview)
+- [CodeMirror 6](https://codemirror.net/)
+- [marked](https://marked.js.org/)
+- [highlight.js](https://highlightjs.org/)
+
+---
+
+## Horizontal Rules
+
+---
+
+Above this line: three dashes.
+
+***
+
+Above: three asterisks.
+
+___
+
+Above: three underscores.
+
+*Create a new document using the **+** button in the sidebar. Documents are auto-saved to your browser's local storage.*
 `;
 }
 

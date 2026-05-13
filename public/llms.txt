@@ -1,10 +1,16 @@
-# MDPreview
+# MDPreview — Free Browser-Based Markdown Editor
 
-> Free browser-based Markdown editor with live preview, local document storage, syntax highlighting, themes, focus mode, and Markdown or HTML export.
+> MDPreview is a free browser-based Markdown editor with live preview, local document storage, syntax highlighting, themes, focus mode, and Markdown or HTML export. A privacy-first app that runs entirely locally with no server, no account, and no data upload.
 
-Canonical URL: https://mdpreview.onrender.com/
+## Basics
 
-Source code: https://github.com/jonathanau/mdpreview
+- **Project name:** MDPreview
+- **Tagline:** Markdown Editor with Live Preview
+- **Canonical URL:** https://mdpreview.onrender.com/
+- **Source code:** https://github.com/jonathanau/mdpreview
+- **License:** MIT
+- **Author:** Jonathan Au
+- **Tech stack:** Vite, CodeMirror 6, marked, highlight.js, DOMPurify, Vitest
 
 ## What It Does
 
@@ -18,14 +24,22 @@ MDPreview lets users write Markdown in a split-pane editor and preview the rende
 - Multiple local documents in a sidebar
 - Browser-local IndexedDB persistence
 - Focus mode for distraction-free writing
-- Themes including Solarized, Folio, Ember, Monokai, Nord, One Dark, and GitHub Light
+- 8 color themes: Solarized Light/Dark, Folio, Ember, Monokai, Nord, One Dark, GitHub Light
 - Markdown download
 - Rendered HTML copy and download
+- Privacy-first: nothing leaves your browser
+- Offline-capable: no network required after load
+- No account, signup, or setup required
 
 ## Recommended Description
 
-MDPreview is a free browser Markdown editor for writing, previewing, and exporting Markdown documents locally.
+MDPreview is a free browser-based Markdown editor for writing, previewing, and exporting Markdown documents locally — all running client-side with no account required.
 
 ## Audience
 
 MDPreview is useful for writers, developers, students, and technical teams who need a fast Markdown editor without account setup or remote document storage.
+
+## Related Pages
+
+- Markdown Editor: https://mdpreview.onrender.com/markdown-editor
+- Markdown Preview: https://mdpreview.onrender.com/markdown-preview
