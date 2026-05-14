@@ -1,6 +1,6 @@
 # MDPreview — Free Browser-Based Markdown Editor
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 **MDPreview** is a free, privacy-first browser-based Markdown editor with live preview. Write with syntax-highlighted code blocks and local document storage — all without a server, account, or signup. No data ever leaves your device.
 
