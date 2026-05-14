@@ -6,6 +6,7 @@ import {
   setEditorContent,
   wrapSelection,
   prefixLine,
+  prefixOrderedLine,
   toggleHeading,
 } from './editor.js';
 import { renderMarkdown, setHljsTheme } from './preview.js';
@@ -419,7 +420,7 @@ ${bodyHtml}
   on('tb-h2', () => toggleHeading(editorView, 2));
   on('tb-h3', () => toggleHeading(editorView, 3));
   on('tb-ul', () => prefixLine(editorView, '- '));
-  on('tb-ol', () => prefixLine(editorView, '1. '));
+  on('tb-ol', () => prefixOrderedLine(editorView));
   on('tb-quote', () => prefixLine(editorView, '> '));
   on('tb-link', () => {
     const { from, to } = editorView.state.selection.main;

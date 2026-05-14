@@ -189,20 +189,106 @@ export function wrapSelection(view, before, after) {
   view.focus();
 }
 
+function getSelectedLines(view) {
+  const { from, to } = view.state.selection.main;
+  const firstLine = view.state.doc.lineAt(from);
+  const lastLine  = view.state.doc.lineAt(to);
+  const lines = [];
+  for (let n = firstLine.number; n <= lastLine.number; n++) {
+    lines.push(view.state.doc.line(n));
+  }
+  if (lines.length > 1 && to === lines[lines.length - 1].from) {
+    lines.pop();
+  }
+  return lines;
+}
+
 export function prefixLine(view, prefix) {
-  const { from } = view.state.selection.main;
-  const line = view.state.doc.lineAt(from);
-  const lineText = line.text;
-  if (lineText.startsWith(prefix)) {
+  const lines = getSelectedLines(view);
+  const { from: selFrom, to: selTo } = view.state.selection.main;
+  const hadSelection = selFrom !== selTo;
+
+  if (lines.length === 1 && lines[0].text.length === 0) {
     view.dispatch({
-      changes: { from: line.from, to: line.from + prefix.length, insert: '' },
+      changes: { from: lines[0].from, to: lines[0].from, insert: prefix },
+      selection: { anchor: lines[0].from + prefix.length },
+    });
+    view.focus();
+    return;
+  }
+
+  const nonEmpty = lines.filter(l => l.text.length > 0);
+  const allPrefixed = nonEmpty.length > 0 && nonEmpty.every(l => l.text.startsWith(prefix));
+
+  let totalDelta = 0;
+  let changes;
+
+  if (allPrefixed) {
+    changes = nonEmpty.map(l => {
+      totalDelta -= prefix.length;
+      return { from: l.from, to: l.from + prefix.length, insert: '' };
     });
   } else {
-    view.dispatch({
-      changes: { from: line.from, to: line.from, insert: prefix },
-      selection: { anchor: line.from + prefix.length },
+    const targets = nonEmpty.filter(l => !l.text.startsWith(prefix));
+    changes = targets.map(l => {
+      totalDelta += prefix.length;
+      return { from: l.from, to: l.from, insert: prefix };
     });
   }
+
+  if (changes.length === 0) { view.focus(); return; }
+  const endPos = lines[lines.length - 1].to + totalDelta;
+  view.dispatch({
+    changes,
+    selection: hadSelection ? { anchor: lines[0].from, head: endPos } : { anchor: endPos },
+  });
+  view.focus();
+}
+
+const isNumbered = (text) => /^\d+\.\s/.test(text);
+
+export function prefixOrderedLine(view) {
+  const lines = getSelectedLines(view);
+  const { from: selFrom, to: selTo } = view.state.selection.main;
+  const hadSelection = selFrom !== selTo;
+
+  if (lines.length === 1 && lines[0].text.length === 0) {
+    view.dispatch({
+      changes: { from: lines[0].from, to: lines[0].from, insert: '1. ' },
+      selection: { anchor: lines[0].from + 3 },
+    });
+    view.focus();
+    return;
+  }
+
+  const nonEmpty = lines.filter(l => l.text.length > 0);
+  const allNumbered = nonEmpty.length > 0 && nonEmpty.every(l => isNumbered(l.text));
+
+  let totalDelta = 0;
+  let changes;
+
+  if (allNumbered) {
+    changes = nonEmpty.map(l => {
+      const match = l.text.match(/^(\d+\.\s)/);
+      totalDelta -= match[1].length;
+      return { from: l.from, to: l.from + match[1].length, insert: '' };
+    });
+  } else {
+    let counter = 1;
+    changes = nonEmpty.map(l => {
+      const existing = isNumbered(l.text) ? l.text.match(/^(\d+\.\s)/)[0] : '';
+      const insert = `${counter++}. `;
+      totalDelta += insert.length - existing.length;
+      return { from: l.from, to: l.from + existing.length, insert };
+    });
+  }
+
+  if (changes.length === 0) { view.focus(); return; }
+  const endPos = lines[lines.length - 1].to + totalDelta;
+  view.dispatch({
+    changes,
+    selection: hadSelection ? { anchor: lines[0].from, head: endPos } : { anchor: endPos },
+  });
   view.focus();
 }
 

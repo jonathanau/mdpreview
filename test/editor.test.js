@@ -5,6 +5,7 @@ import {
   setEditorTheme,
   wrapSelection,
   prefixLine,
+  prefixOrderedLine,
   toggleHeading,
   themeCompartment,
   highlightCompartment,
@@ -372,35 +373,72 @@ describe('prefixLine', () => {
     container.remove();
   });
 
-  it('places cursor after the prefix on empty line when toggling ON', () => {
-    const { view, container } = createTestEditor('');
-    setSelection(view, 0, 0);
-    prefixLine(view, '- ');
-    expect(view.state.selection.main.anchor).toBe(2);
-    container.remove();
-  });
-
-  it('places cursor after the prefix when cursor is at line start', () => {
+  it('places cursor at end of line after toggle ON', () => {
     const { view, container } = createTestEditor('hello');
     setSelection(view, 0, 0);
     prefixLine(view, '- ');
+    expect(view.state.selection.main.anchor).toBe(7);
+    container.remove();
+  });
+
+  it('places cursor at end of line after longer prefix like "1. "', () => {
+    const { view, container } = createTestEditor('item');
+    setSelection(view, 0, 0);
+    prefixLine(view, '1. ');
+    expect(view.state.selection.main.anchor).toBe(7);
+    container.remove();
+  });
+
+  it('places cursor at end of line after "> " prefix', () => {
+    const { view, container } = createTestEditor('quote');
+    setSelection(view, 0, 0);
+    prefixLine(view, '> ');
+    expect(view.state.selection.main.anchor).toBe(7);
+    container.remove();
+  });
+
+  it('inserts "- " and places cursor after it on empty line', () => {
+    const { view, container } = createTestEditor('');
+    setSelection(view, 0, 0);
+    prefixLine(view, '- ');
+    expect(getDoc(view)).toBe('- ');
     expect(view.state.selection.main.anchor).toBe(2);
     container.remove();
   });
 
-  it('places cursor after a longer prefix like "1. " on empty line', () => {
+  it('inserts "> " and places cursor after it on empty line', () => {
+    const { view, container } = createTestEditor('');
+    setSelection(view, 0, 0);
+    prefixLine(view, '> ');
+    expect(getDoc(view)).toBe('> ');
+    expect(view.state.selection.main.anchor).toBe(2);
+    container.remove();
+  });
+
+  it('inserts "1. " and places cursor after it on empty line', () => {
     const { view, container } = createTestEditor('');
     setSelection(view, 0, 0);
     prefixLine(view, '1. ');
+    expect(getDoc(view)).toBe('1. ');
     expect(view.state.selection.main.anchor).toBe(3);
     container.remove();
   });
 
-  it('places cursor after "> " prefix on empty line', () => {
-    const { view, container } = createTestEditor('');
+  it('places cursor at end of content after toggle OFF (cursor only)', () => {
+    const { view, container } = createTestEditor('- hello');
     setSelection(view, 0, 0);
-    prefixLine(view, '> ');
-    expect(view.state.selection.main.anchor).toBe(2);
+    prefixLine(view, '- ');
+    expect(getDoc(view)).toBe('hello');
+    expect(view.state.selection.main.anchor).toBe(5);
+    container.remove();
+  });
+
+  it('places cursor at end of content after toggle OFF "1. " prefix', () => {
+    const { view, container } = createTestEditor('1. hello');
+    setSelection(view, 0, 0);
+    prefixLine(view, '1. ');
+    expect(getDoc(view)).toBe('hello');
+    expect(view.state.selection.main.anchor).toBe(5);
     container.remove();
   });
 });
@@ -773,6 +811,235 @@ describe('prefixLine toggle on multi-line documents', () => {
     setSelection(view, 14, 14);
     prefixLine(view, '> ');
     expect(getDoc(view)).toBe('- line1\nline2\n> line3');
+    container.remove();
+  });
+});
+
+// ─── Multi-line prefixLine ────────────────────────────────────────────────
+
+describe('Multi-line prefixLine', () => {
+  it('toggle UL ON on all unprefixed lines', () => {
+    const { view, container } = createTestEditor('a\nb\nc');
+    setSelection(view, 0, 5); // selects all 3 lines
+    prefixLine(view, '- ');
+    expect(getDoc(view)).toBe('- a\n- b\n- c');
+    container.remove();
+  });
+
+  it('toggle UL OFF on all prefixed lines', () => {
+    const { view, container } = createTestEditor('- a\n- b\n- c');
+    setSelection(view, 0, 11);
+    prefixLine(view, '- ');
+    expect(getDoc(view)).toBe('a\nb\nc');
+    container.remove();
+  });
+
+  it('toggle UL ON on mixed selection (only unprefixed get prefix)', () => {
+    const { view, container } = createTestEditor('- a\nb\n- c');
+    setSelection(view, 0, 9);
+    prefixLine(view, '- ');
+    expect(getDoc(view)).toBe('- a\n- b\n- c');
+    container.remove();
+  });
+
+  it('toggle UL ON excludes empty lines', () => {
+    const { view, container } = createTestEditor('a\n\nc');
+    setSelection(view, 0, 4);
+    prefixLine(view, '- ');
+    expect(getDoc(view)).toBe('- a\n\n- c');
+    container.remove();
+  });
+
+  it('toggle UL OFF leaves empty lines alone', () => {
+    const { view, container } = createTestEditor('- a\n\n- c');
+    setSelection(view, 0, 8);
+    prefixLine(view, '- ');
+    expect(getDoc(view)).toBe('a\n\nc');
+    container.remove();
+  });
+
+  it('dangling selection at next line start excludes that line', () => {
+    const { view, container } = createTestEditor('a\nb\nc');
+    setSelection(view, 0, 2);
+    prefixLine(view, '- ');
+    expect(getDoc(view)).toBe('- a\nb\nc');
+    container.remove();
+  });
+
+  it('preserves selection across all lines after multi-line toggle ON', () => {
+    const { view, container } = createTestEditor('a\nb');
+    setSelection(view, 0, 3);
+    prefixLine(view, '- ');
+    const sel = view.state.selection.main;
+    expect(sel.anchor).toBe(0);
+    expect(sel.head).toBe(7);
+    container.remove();
+  });
+
+  it('preserves selection across all lines after multi-line toggle OFF', () => {
+    const { view, container } = createTestEditor('- a\n- b');
+    setSelection(view, 0, 7);
+    prefixLine(view, '- ');
+    const sel = view.state.selection.main;
+    expect(sel.anchor).toBe(0);
+    expect(sel.head).toBe(3);
+    container.remove();
+  });
+});
+
+// ─── prefixOrderedLine ────────────────────────────────────────────────────
+
+describe('prefixOrderedLine', () => {
+  it('adds "1. " prefix to an unprefixed line (toggle ON)', () => {
+    const { view, container } = createTestEditor('item');
+    setSelection(view, 0, 0);
+    prefixOrderedLine(view);
+    expect(getDoc(view)).toBe('1. item');
+    container.remove();
+  });
+
+  it('places cursor at end of line on toggle ON (single line)', () => {
+    const { view, container } = createTestEditor('item');
+    setSelection(view, 0, 0);
+    prefixOrderedLine(view);
+    expect(view.state.selection.main.anchor).toBe(7);
+    container.remove();
+  });
+
+  it('inserts "1. " and places cursor after it on empty line', () => {
+    const { view, container } = createTestEditor('');
+    setSelection(view, 0, 0);
+    prefixOrderedLine(view);
+    expect(getDoc(view)).toBe('1. ');
+    expect(view.state.selection.main.anchor).toBe(3);
+    container.remove();
+  });
+
+  it('removes "1. " prefix from a numbered line (toggle OFF)', () => {
+    const { view, container } = createTestEditor('1. item');
+    setSelection(view, 0, 0);
+    prefixOrderedLine(view);
+    expect(getDoc(view)).toBe('item');
+    container.remove();
+  });
+
+  it('places cursor at end of content after toggle OFF (cursor only)', () => {
+    const { view, container } = createTestEditor('1. item');
+    setSelection(view, 0, 0);
+    prefixOrderedLine(view);
+    expect(getDoc(view)).toBe('item');
+    expect(view.state.selection.main.anchor).toBe(4);
+    container.remove();
+  });
+
+  it('assigns sequential numbers on multi-line toggle ON', () => {
+    const { view, container } = createTestEditor('a\nb\nc');
+    setSelection(view, 0, 5);
+    prefixOrderedLine(view);
+    expect(getDoc(view)).toBe('1. a\n2. b\n3. c');
+    container.remove();
+  });
+
+  it('removes all number prefixes on multi-line toggle OFF', () => {
+    const { view, container } = createTestEditor('1. a\n2. b\n3. c');
+    setSelection(view, 0, 14);
+    prefixOrderedLine(view);
+    expect(getDoc(view)).toBe('a\nb\nc');
+    container.remove();
+  });
+
+  it('skips already-numbered lines and numbers the rest sequentially', () => {
+    const { view, container } = createTestEditor('1. a\nb\n3. c');
+    setSelection(view, 0, 11);
+    prefixOrderedLine(view);
+    expect(getDoc(view)).toBe('1. a\n2. b\n3. c');
+    container.remove();
+  });
+
+  it('skips empty lines on toggle ON', () => {
+    const { view, container } = createTestEditor('a\n\nc');
+    setSelection(view, 0, 4);
+    prefixOrderedLine(view);
+    expect(getDoc(view)).toBe('1. a\n\n2. c');
+    container.remove();
+  });
+
+  it('handles toggle OFF with multi-digit numbers', () => {
+    const { view, container } = createTestEditor('10. a\n20. b');
+    setSelection(view, 0, 11);
+    prefixOrderedLine(view);
+    expect(getDoc(view)).toBe('a\nb');
+    container.remove();
+  });
+
+  it('dangling selection at next line start excludes that line', () => {
+    const { view, container } = createTestEditor('a\nb\nc');
+    setSelection(view, 0, 2);
+    prefixOrderedLine(view);
+    expect(getDoc(view)).toBe('1. a\nb\nc');
+    container.remove();
+  });
+
+  it('preserves selection across all lines after multi-line toggle ON', () => {
+    const { view, container } = createTestEditor('a\nb');
+    setSelection(view, 0, 3);
+    prefixOrderedLine(view);
+    const sel = view.state.selection.main;
+    expect(sel.anchor).toBe(0);
+    expect(sel.head).toBe(9);
+    container.remove();
+  });
+
+  it('preserves selection across all lines after multi-line toggle OFF', () => {
+    const { view, container } = createTestEditor('1. a\n2. b');
+    setSelection(view, 0, 9);
+    prefixOrderedLine(view);
+    const sel = view.state.selection.main;
+    expect(sel.anchor).toBe(0);
+    expect(sel.head).toBe(3);
+    container.remove();
+  });
+});
+
+// ─── Enter key after list creation ─────────────────────────────────────────
+
+describe('Enter after list creation', () => {
+  it('continues numbered list correctly from cursor at end of line', async () => {
+    const { view, container } = createTestEditor('');
+    const { insertNewlineContinueMarkup } = await import('@codemirror/lang-markdown');
+
+    // Simulate: OL button → "1. ", type "item" → "1. item", cursor at end (pos 7)
+    view.dispatch({ changes: { from: 0, insert: '1. item' }, selection: { anchor: 7 } });
+
+    insertNewlineContinueMarkup(view);
+    expect(getDoc(view)).toBe('1. item\n2. ');
+    container.remove();
+  });
+
+  it('continues numbered list correctly after prefixOrderedLine', async () => {
+    const { view, container } = createTestEditor('');
+    const { insertNewlineContinueMarkup } = await import('@codemirror/lang-markdown');
+
+    // Simulate: OL button on empty line, then type "item"
+    prefixOrderedLine(view);
+    view.dispatch({ changes: { from: 3, insert: 'item' }, selection: { anchor: 7 } });
+
+    expect(getDoc(view)).toBe('1. item');
+    insertNewlineContinueMarkup(view);
+    expect(getDoc(view)).toBe('1. item\n2. ');
+    container.remove();
+  });
+
+  it('continues bullet list correctly after prefixLine', async () => {
+    const { view, container } = createTestEditor('');
+    const { insertNewlineContinueMarkup } = await import('@codemirror/lang-markdown');
+
+    prefixLine(view, '- ');
+    view.dispatch({ changes: { from: 2, insert: 'item' }, selection: { anchor: 6 } });
+
+    expect(getDoc(view)).toBe('- item');
+    insertNewlineContinueMarkup(view);
+    expect(getDoc(view)).toBe('- item\n- ');
     container.remove();
   });
 });
