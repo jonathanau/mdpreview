@@ -49,3 +49,5 @@ build/
 # Kilo CLI
 .kilo/
 
+# Antigravity CLI
+.antigravitycli/
