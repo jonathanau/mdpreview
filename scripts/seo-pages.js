@@ -89,10 +89,14 @@ function pageHtml(page) {
   <meta property="og:title" content="${escapeHtml(page.title)}" />
   <meta property="og:description" content="${escapeHtml(page.description)}" />
   <meta property="og:url" content="${page.canonical}" />
-  <meta property="og:image" content="${BASE_URL}/icon-192.png" />
-  <meta name="twitter:card" content="summary" />
+  <meta property="og:image" content="${BASE_URL}/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="MDPreview — Free browser-based Markdown editor with live preview" />
+  <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="${escapeHtml(page.title)}" />
   <meta name="twitter:description" content="${escapeHtml(page.description)}" />
+  <meta name="twitter:image" content="${BASE_URL}/og-image.png" />
   <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -220,6 +224,9 @@ ${urls.map(u => `  <url>
 function generateRobots() {
   return `User-agent: *
 Allow: /
+Disallow: /fonts/
+Disallow: /assets/
+
 Sitemap: ${BASE_URL}/sitemap.xml
 `;
 }
