@@ -9,7 +9,7 @@ import solarizedLightCssUrl from 'highlight.js/styles/base16/solarized-light.css
 import solarizedDarkCssUrl from 'highlight.js/styles/base16/solarized-dark.css?url';
 import monokaiCssUrl from 'highlight.js/styles/monokai.css?url';
 import nordCssUrl from 'highlight.js/styles/nord.css?url';
-import draculaCssUrl from 'highlight.js/styles/base16/dracula.css?url';
+import atomOneDarkCssUrl from 'highlight.js/styles/atom-one-dark.css?url';
 
 // ─── Configure marked ──────────────────────────────────────────────────────
 
@@ -36,7 +36,7 @@ const hljsThemes = {
   'solarized-dark': solarizedDarkCssUrl,
   'monokai': monokaiCssUrl,
   'nord': nordCssUrl,
-  'one-dark': draculaCssUrl,
+  'one-dark': atomOneDarkCssUrl,
   'github-light': githubCssUrl
 };
 

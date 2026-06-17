@@ -14,6 +14,7 @@
   --syntax-string: #2aa198;
   --syntax-number: #d33682;
   --syntax-function: #268bd2;
+  --danger: #dc3545;
   --sidebar-w: 220px;
   --toolbar-h: 48px;
   --status-h: 32px;
@@ -35,6 +36,7 @@
   --syntax-string: #2aa198;
   --syntax-number: #d33682;
   --syntax-function: #268bd2;
+  --danger: #c92c2c;
 }
 
 [data-theme="folio"] {
@@ -53,6 +55,7 @@
   --syntax-string: #3c7a3c;
   --syntax-number: #1565c0;
   --syntax-function: #5a3a9a;
+  --danger: #c92c2c;
 }
 
 [data-theme="ember"] {
@@ -71,6 +74,7 @@
   --syntax-string: #98c379;
   --syntax-number: #61afef;
   --syntax-function: #c678dd;
+  --danger: #e06c75;
 }
 
 [data-theme="monokai"] {
@@ -89,6 +93,7 @@
   --syntax-string: #e6db74;
   --syntax-number: #ae81ff;
   --syntax-function: #a6e22e;
+  --danger: #f92672;
 }
 
 [data-theme="nord"] {
@@ -107,6 +112,7 @@
   --syntax-string: #a3be8c;
   --syntax-number: #b48ead;
   --syntax-function: #88c0d0;
+  --danger: #bf616a;
 }
 
 [data-theme="one-dark"] {
@@ -125,6 +131,7 @@
   --syntax-string: #98c379;
   --syntax-number: #d19a66;
   --syntax-function: #61afef;
+  --danger: #e06c75;
 }
 
 [data-theme="github-light"] {
@@ -143,6 +150,7 @@
   --syntax-string: #0a3069;
   --syntax-number: #0550ae;
   --syntax-function: #8250df;
+  --danger: #cf222e;
 }
 
 /* ─── Reset ──────────────────────────────────────────────────────────────── */
@@ -753,14 +761,13 @@ html, body {
 }
 
 .confirm-btn-danger {
-  background: #dc3545;
-  border-color: #dc3545;
+  background: var(--danger);
+  border-color: var(--danger);
   color: #fff;
 }
 
 .confirm-btn-danger:hover {
-  background: #c82333;
-  border-color: #c82333;
+  filter: brightness(0.85);
 }
 
 /* ─── Focus mode ─────────────────────────────────────────────────────────── */
@@ -812,7 +819,6 @@ body.focus-mode .cm-scroller { font-size: 16px !important; }
 @media (max-width: 680px) {
   .mobile-only { display: flex; }
   #sidebar { display: none; }
-  #splitter { display: none; }
   #editor-pane { flex: 1; border: none; }
   #preview-pane { display: none; }
   body.mobile-preview #editor-pane { display: none; }

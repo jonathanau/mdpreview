@@ -1,5 +1,6 @@
 import { writeFileSync, mkdirSync, existsSync, readFileSync } from 'fs';
-import { resolve, dirname } from 'path';
+import { resolve } from 'path';
+import { escapeHtml } from '../src/escape-html.js';
 
 const BASE_URL = 'https://mdpreview.onrender.com';
 const NOW = new Date().toISOString().slice(0, 10);
@@ -61,10 +62,6 @@ const PAGES = [
     canonical: `${BASE_URL}/markdown-preview`,
   },
 ];
-
-function escapeHtml(str) {
-  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-}
 
 function pageHtml(page) {
   const appUrl = BASE_URL;

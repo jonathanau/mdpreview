@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import {
   createEditor,
   setEditorContent,
@@ -7,8 +7,6 @@ import {
   prefixLine,
   prefixOrderedLine,
   toggleHeading,
-  themeCompartment,
-  highlightCompartment,
 } from '../src/editor.js';
 
 // ─── Helper ──────────────────────────────────────────────────────────────
@@ -44,7 +42,7 @@ describe('createEditor', () => {
   });
 
   it('appends the editor DOM to the container', () => {
-    const { view, container } = createTestEditor();
+    const { container } = createTestEditor();
     expect(container.querySelector('.cm-editor')).toBeTruthy();
     container.remove();
   });

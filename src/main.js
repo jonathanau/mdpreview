@@ -10,6 +10,7 @@ import {
   toggleHeading,
 } from './editor.js';
 import { renderMarkdown, setHljsTheme } from './preview.js';
+import { escapeHtml, isThemeDark } from './helpers.js';
 
 // ─── State ────────────────────────────────────────────────────────────────
 
@@ -44,7 +45,10 @@ async function init() {
     return;
   }
 
-  currentTheme = localStorage.getItem('md-theme') || 'solarized-light';
+  const savedTheme = localStorage.getItem('md-theme');
+  if (savedTheme === 'light') currentTheme = 'folio';
+  else if (savedTheme === 'dark') currentTheme = 'ember';
+  else currentTheme = savedTheme || 'solarized-light';
   applyTheme();
 
   const savedSidebar = localStorage.getItem('md-sidebar');
@@ -87,6 +91,7 @@ async function init() {
 // ─── Document management ──────────────────────────────────────────────────
 
 async function openDoc(id) {
+  clearTimeout(previewTimer);
   if (saveTimer && currentDoc) {
     clearTimeout(saveTimer);
     saveTimer = null;
@@ -207,14 +212,14 @@ function updateStats(text) {
 
 // ─── Theme ────────────────────────────────────────────────────────────────
 
-function isThemeDark(theme) {
-  return ['solarized-dark', 'ember', 'monokai', 'nord', 'one-dark'].includes(theme);
-}
-
 function applyTheme() {
   document.documentElement.setAttribute('data-theme', currentTheme);
   setHljsTheme(currentTheme);
   if (editorView) setEditorTheme(editorView, isThemeDark(currentTheme));
+
+  // Update theme-color meta for browser chrome
+  const bg = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', bg);
 
   // Update custom dropdown
   document.querySelectorAll('.theme-option').forEach(opt => {
@@ -376,12 +381,12 @@ function setupToolbar() {
 
   on('btn-copy-md', () => {
     const content = editorView.state.doc.toString();
-    navigator.clipboard.writeText(content).then(() => showToast('Markdown copied'));
+    navigator.clipboard.writeText(content).then(() => showToast('Markdown copied')).catch(() => showToast('Failed to copy'));
   });
 
   on('btn-copy-html', () => {
     const html = renderMarkdown(editorView.state.doc.toString());
-    navigator.clipboard.writeText(html).then(() => showToast('HTML copied'));
+    navigator.clipboard.writeText(html).then(() => showToast('HTML copied')).catch(() => showToast('Failed to copy'));
   });
 
   on('btn-download-html', () => {
@@ -505,10 +510,6 @@ function showToast(msg) {
   t.textContent = msg;
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2200);
-}
-
-function escapeHtml(str) {
-  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
 function showConfirm(message) {
